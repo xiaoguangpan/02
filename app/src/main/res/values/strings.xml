@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">定红定位模拟器</string>
+    
+    <!-- 主界面 -->
+    <string name="search_hint">输入地址或坐标 (如: 116.404,39.915)</string>
+    <string name="current_location">获取当前位置</string>
+    <string name="start_simulation">开始模拟</string>
+    <string name="stop_simulation">停止模拟</string>
+    <string name="enhanced_mode">增强模式</string>
+    <string name="current_coordinate">当前坐标: %s</string>
+    
+    <!-- 控制按钮 -->
+    <string name="debug_panel">调试面板</string>
+    <string name="help">帮助</string>
+    <string name="compass_reset">指南针重置</string>
+    <string name="zoom_in">放大</string>
+    <string name="zoom_out">缩小</string>
+    
+    <!-- 调试面板 -->
+    <string name="debug_logs">调试日志</string>
+    <string name="clear_logs">清除</string>
+    <string name="copy_logs">复制</string>
+    <string name="close">关闭</string>
+    <string name="expand">展开</string>
+    <string name="collapse">收起</string>
+    <string name="no_logs">暂无调试日志</string>
+    
+    <!-- 状态信息 -->
+    <string name="simulation_status">模拟状态</string>
+    <string name="location_permission">位置权限</string>
+    <string name="mock_permission">模拟权限</string>
+    <string name="permission_granted">已授权</string>
+    <string name="permission_denied">未授权</string>
+    
+    <!-- 错误信息 -->
+    <string name="error_no_location_selected">请先选择要模拟的位置</string>
+    <string name="error_permission_denied">权限被拒绝，请在设置中授予权限</string>
+    <string name="error_mock_location_disabled">请在开发者选项中启用模拟位置</string>
+    <string name="error_baidu_map_init_failed">百度地图初始化失败</string>
+    <string name="error_search_failed">搜索失败，请检查网络连接</string>
+    <string name="error_coordinate_invalid">坐标格式无效</string>
+    
+    <!-- 成功信息 -->
+    <string name="success_simulation_started">位置模拟已启动</string>
+    <string name="success_simulation_stopped">位置模拟已停止</string>
+    <string name="success_logs_copied">调试日志已复制到剪贴板</string>
+    <string name="success_logs_cleared">调试日志已清除</string>
+    <string name="success_location_updated">位置已更新</string>
+    
+    <!-- 帮助信息 -->
+    <string name="help_title">使用帮助</string>
+    <string name="help_content">
+        1. 在地图上点击或搜索地址选择目标位置\n
+        2. 点击"开始模拟"按钮启动位置模拟\n
+        3. 根据需要选择标准模式或增强模式\n
+        4. 使用调试面板查看详细运行状态\n
+        5. 点击"停止模拟"按钮结束位置模拟\n\n
+        注意事项:\n
+        • 请在开发者选项中启用模拟位置\n
+        • 确保已授予位置权限\n
+        • 仅供学习研究和合法测试使用
+    </string>
+    
+    <!-- 权限说明 -->
+    <string name="permission_location_rationale">需要位置权限来获取和模拟GPS位置</string>
+    <string name="permission_storage_rationale">需要存储权限来保存调试日志和配置文件</string>
+    <string name="permission_settings_rationale">需要系统设置权限来优化模拟效果</string>
+    
+    <!-- 坐标系说明 -->
+    <string name="coordinate_system_bd09">BD09LL(百度坐标)</string>
+    <string name="coordinate_system_wgs84">WGS84(GPS坐标)</string>
+    <string name="coordinate_system_gcj02">GCJ02(火星坐标)</string>
+    
+    <!-- 模拟模式说明 -->
+    <string name="mode_standard">标准模式</string>
+    <string name="mode_enhanced">增强模式</string>
+    <string name="mode_standard_desc">100ms更新间隔，固定坐标</string>
+    <string name="mode_enhanced_desc">50ms更新间隔，微坐标抖动，动态精度</string>
+</resources>

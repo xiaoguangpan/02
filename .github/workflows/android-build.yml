@@ -1,0 +1,163 @@
+name: Android CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 缓存 Gradle 依赖
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: 授予 Gradle 执行权限
+      run: chmod +x gradlew
+      
+    - name: 构建 Debug APK
+      run: ./gradlew assembleDebug
+      
+    - name: 构建 Release APK
+      run: ./gradlew assembleRelease
+      
+    - name: 生成签名信息
+      run: |
+        echo "=== 定红定位模拟器构建信息 ===" > build-info.txt
+        echo "构建时间: $(date)" >> build-info.txt
+        echo "Git提交: ${{ github.sha }}" >> build-info.txt
+        echo "分支: ${{ github.ref_name }}" >> build-info.txt
+        echo "" >> build-info.txt
+        echo "=== 应用信息 ===" >> build-info.txt
+        echo "应用名称: 定红定位模拟器" >> build-info.txt
+        echo "包名: com.dinghong.locationmock" >> build-info.txt
+        echo "版本: 2.0" >> build-info.txt
+        echo "" >> build-info.txt
+        echo "=== Debug版本SHA1 ===" >> build-info.txt
+        keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep SHA1 >> build-info.txt || echo "无法获取Debug SHA1" >> build-info.txt
+        echo "" >> build-info.txt
+        echo "=== 百度地图SDK配置说明 ===" >> build-info.txt
+        echo "请使用以下信息在百度地图开放平台申请API Key:" >> build-info.txt
+        echo "包名(PackageName): com.dinghong.locationmock" >> build-info.txt
+        echo "SHA1: 请查看上方Debug版本SHA1信息" >> build-info.txt
+        echo "申请地址: https://lbsyun.baidu.com/apiconsole/key" >> build-info.txt
+        echo "" >> build-info.txt
+        echo "=== 文件信息 ===" >> build-info.txt
+        ls -la app/build/outputs/apk/debug/ >> build-info.txt
+        ls -la app/build/outputs/apk/release/ >> build-info.txt
+        
+    - name: 重命名APK文件
+      run: |
+        mkdir -p release-files
+        cp app/build/outputs/apk/debug/app-debug.apk release-files/dinghong-debug-v2.0.apk
+        cp app/build/outputs/apk/release/app-release-unsigned.apk release-files/dinghong-release-v2.0-unsigned.apk
+        cp build-info.txt release-files/
+        
+    - name: 上传Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: dinghong-debug-apk
+        path: release-files/dinghong-debug-v2.0.apk
+        
+    - name: 上传Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: dinghong-release-apk
+        path: release-files/dinghong-release-v2.0-unsigned.apk
+        
+    - name: 上传构建信息
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-info
+        path: release-files/build-info.txt
+        
+    - name: 输出构建结果
+      run: |
+        echo "🎉 定红定位模拟器构建完成!"
+        echo ""
+        echo "📱 应用信息:"
+        echo "  - 应用名称: 定红定位模拟器"
+        echo "  - 包名: com.dinghong.locationmock"
+        echo "  - 版本: 2.0"
+        echo ""
+        echo "📦 构建产物:"
+        echo "  - Debug APK: dinghong-debug-v2.0.apk"
+        echo "  - Release APK: dinghong-release-v2.0-unsigned.apk"
+        echo "  - 构建信息: build-info.txt"
+        echo ""
+        echo "🔑 百度地图SDK配置:"
+        echo "  1. 访问: https://lbsyun.baidu.com/apiconsole/key"
+        echo "  2. 创建应用，选择Android平台"
+        echo "  3. 输入包名: com.dinghong.locationmock"
+        echo "  4. 输入SHA1: 请查看build-info.txt文件"
+        echo "  5. 将获得的API Key替换AndroidManifest.xml中的YOUR_BAIDU_MAP_API_KEY"
+        echo ""
+        echo "✅ 所有文件已上传到GitHub Actions Artifacts"
+        
+  # 发布到Release（仅在创建Release时触发）
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: 下载构建产物
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        
+    - name: 上传到Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          artifacts/dinghong-debug-apk/dinghong-debug-v2.0.apk
+          artifacts/dinghong-release-apk/dinghong-release-v2.0-unsigned.apk
+          artifacts/build-info/build-info.txt
+        body: |
+          ## 定红定位模拟器 v2.0
+          
+          ### 🚀 新功能特性
+          - ✨ 全新Material Design 3界面设计
+          - 🗺️ 集成百度地图SDK，支持卫星地图显示
+          - 🎯 智能位置模拟系统（标准模式 + 增强模式）
+          - 🔍 智能地址搜索和坐标输入识别
+          - 🛠️ 专业调试面板，实时状态监控
+          - 📱 适配Android 6.0 - 14.0全版本
+          
+          ### 📋 使用说明
+          1. 下载并安装APK文件
+          2. 在开发者选项中启用"模拟位置信息应用"
+          3. 申请百度地图API Key并配置到应用中
+          4. 授予位置权限后即可使用
+          
+          ### 🔑 百度地图API Key配置
+          - 包名: `com.dinghong.locationmock`
+          - SHA1: 请查看build-info.txt文件
+          - 申请地址: https://lbsyun.baidu.com/apiconsole/key
+          
+          ### 📦 下载文件
+          - `dinghong-debug-v2.0.apk`: 调试版本（推荐）
+          - `dinghong-release-v2.0-unsigned.apk`: 发布版本（未签名）
+          - `build-info.txt`: 构建信息和配置说明
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
