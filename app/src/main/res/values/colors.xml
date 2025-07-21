@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- Custom App Colors -->
+    <color name="dinghong_primary">#1976D2</color>
+    <color name="dinghong_secondary">#03DAC6</color>
+    <color name="dinghong_error">#CF6679</color>
+    <color name="dinghong_surface">#121212</color>
+    <color name="dinghong_background">#000000</color>
+
+    <!-- Debug Log Colors -->
+    <color name="debug_log_error">#FF5252</color>
+    <color name="debug_log_success">#4CAF50</color>
+    <color name="debug_log_info">#2196F3</color>
+    <color name="debug_log_coordinate">#9C27B0</color>
+    <color name="debug_log_warning">#FF9800</color>
+
+    <!-- Map Colors -->
+    <color name="map_marker_color">#FF4444</color>
+    <color name="map_accuracy_circle">#3300BCD4</color>
+    <color name="floating_button_background">#E6000000</color>
+    <color name="control_card_background">#E6121212</color>
+</resources>
