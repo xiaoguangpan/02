@@ -49,6 +49,7 @@ fun MainScreen(
         RealBaiduMapView(
             modifier = Modifier.fillMaxSize(),
             onMapReady = { baiduMap ->
+                // 传递真实的BaiduMap对象给ViewModel
                 viewModel.onMapReady(baiduMap)
             },
             onMapClick = { latLng ->

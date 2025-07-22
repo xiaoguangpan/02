@@ -15,10 +15,10 @@ import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 
-// 百度地图SDK导入 - 需要下载AAR文件后启用
-// import com.baidu.mapapi.map.BaiduMap
-// import com.baidu.mapapi.map.MapView
-// import com.baidu.mapapi.model.LatLng
+// 百度地图SDK导入
+import com.baidu.mapapi.map.BaiduMap
+import com.baidu.mapapi.map.MapView
+import com.baidu.mapapi.model.LatLng as BaiduLatLng
 
 /**
  * 真实的百度地图组件
@@ -27,7 +27,7 @@ import android.widget.FrameLayout
 @Composable
 fun RealBaiduMapView(
     modifier: Modifier = Modifier,
-    onMapReady: (Any) -> Unit = {},
+    onMapReady: (BaiduMap?) -> Unit = {},
     onMapClick: (Pair<Double, Double>) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -85,33 +85,23 @@ fun RealBaiduMapView(
                 factory = { context ->
                     try {
                         Log.i("RealBaiduMapView", "开始创建百度地图视图...")
-                        
-                        // 创建百度地图视图 - 需要百度地图SDK
-                        // val mapView = MapView(context)
-                        // val baiduMap = mapView.map
-                        
-                        // 临时使用FrameLayout作为占位符，模拟地图背景
-                        val frameLayout = FrameLayout(context).apply {
-                            setBackgroundColor(android.graphics.Color.parseColor("#E8F4FD"))
-                            // 添加点击事件处理
-                            setOnClickListener { view ->
-                                // 模拟地图点击，转换屏幕坐标为地理坐标
-                                val x = view.width / 2.0
-                                val y = view.height / 2.0
-                                // 模拟坐标（北京天安门附近）
-                                val lat = 39.904200 + (Math.random() - 0.5) * 0.01
-                                val lng = 116.407400 + (Math.random() - 0.5) * 0.01
-                                onMapClick(lat to lng)
-                            }
+
+                        // 创建百度地图视图
+                        val mapView = MapView(context)
+                        val baiduMap = mapView.map
+
+                        // 配置地图点击事件
+                        baiduMap.setOnMapClickListener { latLng ->
+                            onMapClick(latLng.latitude to latLng.longitude)
                         }
-                        
-                        Log.i("RealBaiduMapView", "百度地图视图创建成功（占位符模式）")
-                        
-                        // 模拟地图准备完成
+
+                        Log.i("RealBaiduMapView", "✅ 百度地图视图创建成功")
+
+                        // 地图准备完成
                         isMapReady = true
-                        onMapReady(Any()) // 传递一个占位符对象
-                        
-                        frameLayout
+                        onMapReady(baiduMap)
+
+                        mapView
                         
                     } catch (e: Exception) {
                         Log.e("RealBaiduMapView", "创建百度地图视图失败: ${e.message}")
@@ -123,15 +113,13 @@ fun RealBaiduMapView(
             ) { view ->
                 // 地图视图更新逻辑
                 try {
-                    // 配置地图属性 - 需要百度地图SDK
-                    // val mapView = view as? MapView
-                    // mapView?.let { mv ->
-                    //     val baiduMap = mv.map
-                    //     // 配置地图点击事件
-                    //     baiduMap.setOnMapClickListener { latLng ->
-                    //         onMapClick(latLng.latitude to latLng.longitude)
-                    //     }
-                    // }
+                    // 配置地图属性
+                    val mapView = view as? MapView
+                    mapView?.let { mv ->
+                        val baiduMap = mv.map
+                        // 地图点击事件已在创建时配置
+                        Log.d("RealBaiduMapView", "地图配置完成")
+                    }
                     
                     Log.d("RealBaiduMapView", "地图视图更新完成")
                 } catch (e: Exception) {

@@ -171,17 +171,22 @@ class MainViewModel : ViewModel() {
     /**
      * 地图准备完成
      */
-    fun onMapReady(baiduMap: BaiduMap) {
+    fun onMapReady(baiduMap: com.baidu.mapapi.map.BaiduMap?) {
         try {
-            addDebugLog("正在配置地图交互管理器...", "INFO")
-            mapInteractionManager.initializeMap(baiduMap)
+            if (baiduMap != null) {
+                addDebugLog("正在配置地图交互管理器...", "INFO")
+                mapInteractionManager.initializeMap(baiduMap)
 
-            addDebugLog("✅ 地图组件初始化完成", "SUCCESS")
-            addDebugLog("地图状态：模拟模式 - 网格背景显示", "INFO")
-            addDebugLog("📍 可以点击地图选择位置或输入坐标", "INFO")
-            addDebugLog("🎯 当前默认位置：北京天安门", "INFO")
+                addDebugLog("✅ 百度地图组件初始化完成", "SUCCESS")
+                addDebugLog("🗺️ 地图类型: 百度地图SDK", "INFO")
+                addDebugLog("📍 可以点击地图选择位置或搜索地址", "INFO")
+                addDebugLog("🎯 当前默认位置：北京天安门", "INFO")
+            } else {
+                addDebugLog("⚠️ 地图对象为空，跳过初始化", "WARNING")
+            }
         } catch (e: Exception) {
             addDebugLog("❌ 地图初始化失败: ${e.message}", "ERROR")
+            android.util.Log.e(TAG, "地图初始化异常", e)
         }
     }
     

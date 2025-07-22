@@ -8,20 +8,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-// 临时注释百度地图SDK导入
-// import com.baidu.mapapi.map.*
-// import com.baidu.mapapi.model.LatLng
-// import com.baidu.mapapi.search.core.SearchResult
-// import com.baidu.mapapi.search.geocode.*
-// import com.baidu.mapapi.search.poi.*
+// 百度地图SDK导入
+import com.baidu.mapapi.map.*
+import com.baidu.mapapi.model.LatLng as BaiduLatLng
+import com.baidu.mapapi.search.core.SearchResult
+import com.baidu.mapapi.search.geocode.*
+import com.baidu.mapapi.search.poi.*
 
-// 临时数据类定义
+// 数据类定义
 data class LatLng(val latitude: Double, val longitude: Double)
-data class BaiduMap(val dummy: String = "placeholder")
-data class Marker(val position: LatLng)
-data class SearchResult(val error: String = "")
-data class GeoCoder(val dummy: String = "placeholder")
-data class PoiSearch(val dummy: String = "placeholder")
 
 /**
  * 搜索结果项数据类
@@ -44,10 +39,10 @@ class MapInteractionManager(private val context: Context) {
         private const val TAG = "MapInteractionManager"
     }
     
-    private var baiduMap: BaiduMap? = null
+    private var baiduMap: com.baidu.mapapi.map.BaiduMap? = null
     private var geocodeSearch: GeoCoder? = null
     private var poiSearch: PoiSearch? = null
-    private var currentMarker: Marker? = null
+    private var currentMarker: com.baidu.mapapi.map.Marker? = null
     
     private val _selectedLocation = MutableStateFlow<LatLng?>(null)
     val selectedLocation: StateFlow<LatLng?> = _selectedLocation.asStateFlow()
@@ -67,12 +62,12 @@ class MapInteractionManager(private val context: Context) {
      * 初始化地图（模拟版本）
      * 注意：当前使用模拟地图组件，等待百度地图SDK集成
      */
-    fun initializeMap(map: BaiduMap) {
+    fun initializeMap(map: com.baidu.mapapi.map.BaiduMap) {
         this.baiduMap = map
 
-        // 临时注释搜索服务初始化
-        // geocodeSearch = GeoCoder.newInstance()
-        // poiSearch = PoiSearch.newInstance()
+        // 初始化搜索服务
+        geocodeSearch = GeoCoder.newInstance()
+        poiSearch = PoiSearch.newInstance()
 
         Log.i(TAG, "模拟地图组件已初始化，等待百度地图SDK集成")
     }
@@ -330,10 +325,10 @@ class MapInteractionManager(private val context: Context) {
      * 清理资源（临时简化版本）
      */
     fun cleanup() {
-        // 临时注释资源清理
-        // geocodeSearch?.destroy()
-        // poiSearch?.destroy()
-        // currentMarker?.remove()
+        // 清理资源
+        geocodeSearch?.destroy()
+        poiSearch?.destroy()
+        currentMarker?.remove()
 
         Log.i(TAG, "地图交互管理器已清理")
     }

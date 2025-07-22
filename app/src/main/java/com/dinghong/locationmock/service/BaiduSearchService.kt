@@ -22,7 +22,7 @@ class BaiduSearchService {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     
-    private val api = retrofit.create(BaiduSearchAPI::interface)
+    private val api = retrofit.create(BaiduSearchAPI::class.java)
     
     /**
      * 搜索地址
