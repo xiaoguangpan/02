@@ -18,6 +18,7 @@ import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.manager.FavoriteManager
 import com.dinghong.locationmock.manager.PermissionManager
+import com.dinghong.locationmock.service.BaiduSearchService
 import com.dinghong.locationmock.data.FavoriteLocation
 import com.dinghong.locationmock.manager.SearchResultItem
 import com.dinghong.locationmock.utils.PermissionHelper
@@ -41,6 +42,7 @@ class MainViewModel : ViewModel() {
     private lateinit var favoriteManager: FavoriteManager
     private var permissionManager: PermissionManager? = null
     private lateinit var context: Context
+    private val baiduSearchService = BaiduSearchService()
     
     // UI状态
     private val _uiState = MutableStateFlow(MainUiState())
@@ -238,22 +240,71 @@ class MainViewModel : ViewModel() {
 
                     if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
                         val latLng = LatLng(lat, lng)
-                        mapInteractionManager.moveToLocation(latLng)
+
+                        // 更新UI状态
                         _uiState.value = _uiState.value.copy(
+                            selectedLocation = latLng,
+                            currentCoordinate = formatCoordinate(latLng),
                             searchText = "",
                             searchSuggestions = emptyList()
                         )
-                        addDebugLog("移动到坐标: $lat, $lng")
+
+                        // 通知地图管理器
+                        mapInteractionManager.moveToLocation(latLng)
+
+                        addDebugLog("📍 移动到坐标: ${formatCoordinate(latLng)}", "SUCCESS")
+                        addDebugLog("🎯 当前位置已更新", "INFO")
                     } else {
-                        addDebugLog("坐标超出有效范围")
+                        addDebugLog("❌ 坐标超出有效范围 (纬度: -90~90, 经度: -180~180)", "ERROR")
                     }
                 } catch (e: NumberFormatException) {
-                    addDebugLog("坐标格式错误")
+                    addDebugLog("❌ 坐标格式错误，请使用格式: 纬度,经度", "ERROR")
                 }
             } else {
-                // 处理地址搜索
-                mapInteractionManager.searchAddress(searchText)
-                addDebugLog("搜索地址: $searchText")
+                // 处理地址搜索 - 使用百度地址搜索API
+                searchAddressWithBaiduAPI(searchText)
+            }
+        }
+    }
+
+    /**
+     * 使用百度API搜索地址
+     */
+    private fun searchAddressWithBaiduAPI(query: String) {
+        viewModelScope.launch {
+            try {
+                addDebugLog("🔍 开始搜索地址: $query", "INFO")
+
+                // 使用百度地址搜索API
+                val searchResult = baiduSearchService.searchPlace(query)
+
+                if (searchResult?.status == 0 && !searchResult.results.isNullOrEmpty()) {
+                    val firstResult = searchResult.results.first()
+                    val latLng = LatLng(firstResult.location.lat, firstResult.location.lng)
+
+                    // 更新地图位置
+                    _uiState.value = _uiState.value.copy(
+                        selectedLocation = latLng,
+                        currentCoordinate = formatCoordinate(latLng),
+                        searchText = "",
+                        searchSuggestions = emptyList()
+                    )
+
+                    // 通知地图管理器
+                    mapInteractionManager.moveToLocation(latLng)
+
+                    addDebugLog("✅ 搜索成功: ${firstResult.name}", "SUCCESS")
+                    addDebugLog("📍 地址: ${firstResult.address}", "INFO")
+                    addDebugLog("🎯 坐标: ${formatCoordinate(latLng)}", "COORDINATE")
+
+                } else {
+                    addDebugLog("❌ 未找到地址: $query", "ERROR")
+                    addDebugLog("💡 建议检查地址名称或尝试更具体的描述", "WARNING")
+                }
+
+            } catch (e: Exception) {
+                addDebugLog("❌ 地址搜索失败: ${e.message}", "ERROR")
+                android.util.Log.e(TAG, "地址搜索异常", e)
             }
         }
     }

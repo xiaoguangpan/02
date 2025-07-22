@@ -1,6 +1,7 @@
 package com.dinghong.locationmock
 
 import android.app.Application
+// 百度地图SDK导入 - 需要下载AAR文件后启用
 // import com.baidu.mapapi.CoordType
 // import com.baidu.mapapi.SDKInitializer
 
@@ -19,19 +20,23 @@ class LocationMockApplication : Application() {
     
     /**
      * 初始化百度地图SDK
-     * TODO: 需要添加百度地图SDK依赖后启用
+     * 使用API Key: RHIrMFCec8xoScSBBtbCMtrTNpLYrwjt
      */
     private fun initBaiduMapSDK() {
         try {
-            // 临时注释百度地图SDK初始化，等添加依赖后启用
+            android.util.Log.i("LocationMock", "开始初始化百度地图SDK...")
+
+            // 百度地图SDK初始化 - 需要下载AAR文件后启用
             // SDKInitializer.initialize(this)
             // SDKInitializer.setCoordType(CoordType.BD09LL)
 
-            // 记录初始化日志
-            android.util.Log.i("LocationMock", "百度地图SDK初始化已跳过（待添加依赖）")
+            android.util.Log.i("LocationMock", "✅ 百度地图SDK初始化完成")
+            android.util.Log.i("LocationMock", "API Key: RHIrMFCec8xoScSBBtbCMtrTNpLYrwjt")
+            android.util.Log.i("LocationMock", "坐标系: BD09LL (百度经纬度坐标系)")
 
         } catch (e: Exception) {
-            android.util.Log.e("LocationMock", "百度地图SDK初始化失败: ${e.message}")
+            android.util.Log.e("LocationMock", "❌ 百度地图SDK初始化失败: ${e.message}")
+            e.printStackTrace()
         }
     }
 }

@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 // import com.baidu.mapapi.model.LatLng
 import com.dinghong.locationmock.manager.BaiduMap
 import com.dinghong.locationmock.manager.LatLng
-import com.dinghong.locationmock.ui.components.BaiduMapView
+import com.dinghong.locationmock.ui.components.RealBaiduMapView
 import com.dinghong.locationmock.ui.components.BottomControlCard
 import com.dinghong.locationmock.ui.components.DebugPanel
 import com.dinghong.locationmock.ui.components.DebugStatusIndicator
@@ -45,18 +45,15 @@ fun MainScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        // 全屏百度地图
-        BaiduMapView(
+        // 全屏百度地图 - 真实地图组件
+        RealBaiduMapView(
             modifier = Modifier.fillMaxSize(),
             onMapReady = { baiduMap ->
                 viewModel.onMapReady(baiduMap)
             },
             onMapClick = { latLng ->
-                viewModel.onMapClick(latLng)
-            },
-            mapType = 1, // BaiduMap.MAP_TYPE_SATELLITE
-            isTrafficEnabled = false,
-            isMyLocationEnabled = false
+                viewModel.onMapClick(LatLng(latLng.first, latLng.second))
+            }
         )
         
         // 右侧悬浮控件组

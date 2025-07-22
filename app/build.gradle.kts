@@ -71,10 +71,16 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    // 百度地图SDK - 使用本地AAR文件或Maven仓库
-    implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.5.4")
-    implementation("com.baidu.lbsyun:BaiduMapSDK_Search:7.5.4")
-    implementation("com.baidu.lbsyun:BaiduMapSDK_Util:7.5.4")
+    // 百度地图SDK - 使用本地AAR文件 (需要手动下载到libs目录)
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+
+    // 网络请求依赖 (用于地址搜索API)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // JSON解析
+    implementation("com.google.code.gson:gson:2.10.1")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

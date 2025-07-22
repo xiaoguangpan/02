@@ -99,10 +99,12 @@ private fun SearchInputField(
     OutlinedTextField(
         value = searchText,
         onValueChange = onSearchTextChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp), // 固定高度，防止换行
         placeholder = {
             Text(
-                "输入地址或坐标 (如: 39.9042,116.4074)",
+                "输入地址或坐标",
                 color = Color.Gray,
                 style = MaterialTheme.typography.bodyMedium
             )
