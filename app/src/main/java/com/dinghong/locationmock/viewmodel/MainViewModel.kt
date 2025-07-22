@@ -556,6 +556,13 @@ class MainViewModel : ViewModel() {
         }
     }
     
+    /**
+     * 格式化坐标显示
+     */
+    private fun formatCoordinate(latLng: LatLng): String {
+        return "${String.format("%.6f", latLng.latitude)}, ${String.format("%.6f", latLng.longitude)}"
+    }
+
     override fun onCleared() {
         super.onCleared()
         mapInteractionManager.cleanup()
