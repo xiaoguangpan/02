@@ -200,10 +200,9 @@ class MainViewModel : ViewModel() {
             if (locationMockManager.startLocationMock(
                     selectedLocation.latitude,
                     selectedLocation.longitude,
-                    _uiState.value.isEnhancedMode
+                    false // 使用标准模式
                 )) {
-                val mode = if (_uiState.value.isEnhancedMode) "增强模式" else "标准模式"
-                addDebugLog("位置模拟已启动 ($mode)", "SUCCESS")
+                addDebugLog("位置模拟已启动", "SUCCESS")
             } else {
                 addDebugLog("启动位置模拟失败，请检查权限设置", "ERROR")
             }

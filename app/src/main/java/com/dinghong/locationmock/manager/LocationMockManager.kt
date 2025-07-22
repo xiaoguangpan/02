@@ -33,8 +33,7 @@ class LocationMockManager(private val context: Context) {
      * 模拟模式枚举
      */
     enum class SimulationMode {
-        STANDARD,   // 标准模式
-        ENHANCED    // 增强模式
+        STANDARD   // 标准模式
     }
     
     /**
@@ -100,16 +99,15 @@ class LocationMockManager(private val context: Context) {
                 action = LocationMockService.ACTION_START_MOCK
                 putExtra(LocationMockService.EXTRA_LATITUDE, latitude)
                 putExtra(LocationMockService.EXTRA_LONGITUDE, longitude)
-                putExtra(LocationMockService.EXTRA_ENHANCED_MODE, enhancedMode)
             }
-            
+
             context.startService(intent)
-            
+
             _isSimulating.value = true
             _currentLocation.value = Pair(latitude, longitude)
-            _simulationMode.value = if (enhancedMode) SimulationMode.ENHANCED else SimulationMode.STANDARD
-            
-            Log.i(TAG, "位置模拟已启动: ($latitude, $longitude), 模式: ${if (enhancedMode) "增强" else "标准"}")
+            _simulationMode.value = SimulationMode.STANDARD
+
+            Log.i(TAG, "位置模拟已启动: ($latitude, $longitude)")
             return true
             
         } catch (e: Exception) {
@@ -147,26 +145,12 @@ class LocationMockManager(private val context: Context) {
     }
     
     /**
-     * 切换模拟模式
+     * 切换模拟模式（已简化为仅支持标准模式）
      */
     fun toggleSimulationMode() {
-        val newMode = if (_simulationMode.value == SimulationMode.STANDARD) {
-            SimulationMode.ENHANCED
-        } else {
-            SimulationMode.STANDARD
-        }
-        
-        _simulationMode.value = newMode
-        
-        // 如果正在模拟，重启服务以应用新模式
-        if (_isSimulating.value) {
-            _currentLocation.value?.let { (lat, lng) ->
-                stopLocationMock()
-                startLocationMock(lat, lng, newMode == SimulationMode.ENHANCED)
-            }
-        }
-        
-        Log.i(TAG, "模拟模式已切换为: ${if (newMode == SimulationMode.ENHANCED) "增强" else "标准"}")
+        // 现在只支持标准模式，保持兼容性
+        _simulationMode.value = SimulationMode.STANDARD
+        Log.i(TAG, "使用标准模式")
     }
     
     /**
@@ -175,8 +159,7 @@ class LocationMockManager(private val context: Context) {
     fun getSimulationStatus(): String {
         return if (_isSimulating.value) {
             val location = _currentLocation.value
-            val mode = _simulationMode.value
-            "正在模拟: ${location?.first ?: "N/A"}, ${location?.second ?: "N/A"} (${if (mode == SimulationMode.ENHANCED) "增强" else "标准"}模式)"
+            "正在模拟: ${location?.first ?: "N/A"}, ${location?.second ?: "N/A"}"
         } else {
             "未在模拟"
         }

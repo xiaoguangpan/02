@@ -23,7 +23,7 @@ class LocationMockService : Service() {
         const val ACTION_STOP_MOCK = "com.dinghong.locationmock.STOP_MOCK"
         const val EXTRA_LATITUDE = "latitude"
         const val EXTRA_LONGITUDE = "longitude"
-        const val EXTRA_ENHANCED_MODE = "enhanced_mode"
+
     }
     
     private var locationManager: LocationManager? = null
@@ -33,7 +33,6 @@ class LocationMockService : Service() {
     // 模拟参数
     private var targetLatitude = 0.0
     private var targetLongitude = 0.0
-    private var isEnhancedMode = false
     
     override fun onCreate() {
         super.onCreate()
@@ -46,7 +45,6 @@ class LocationMockService : Service() {
             ACTION_START_MOCK -> {
                 targetLatitude = intent.getDoubleExtra(EXTRA_LATITUDE, 0.0)
                 targetLongitude = intent.getDoubleExtra(EXTRA_LONGITUDE, 0.0)
-                isEnhancedMode = intent.getBooleanExtra(EXTRA_ENHANCED_MODE, false)
                 startLocationMock()
             }
             ACTION_STOP_MOCK -> {
@@ -75,14 +73,10 @@ class LocationMockService : Service() {
             
             // 启动模拟协程
             mockJob = CoroutineScope(Dispatchers.IO).launch {
-                if (isEnhancedMode) {
-                    startEnhancedMock()
-                } else {
-                    startStandardMock()
-                }
+                startStandardMock()
             }
-            
-            Log.i(TAG, "位置模拟已启动 - 模式: ${if (isEnhancedMode) "增强" else "标准"}")
+
+            Log.i(TAG, "位置模拟已启动")
             
         } catch (e: Exception) {
             Log.e(TAG, "启动位置模拟失败: ${e.message}")
@@ -178,28 +172,7 @@ class LocationMockService : Service() {
         }
     }
     
-    /**
-     * 增强模式模拟
-     * 50ms更新间隔，微坐标抖动，动态精度
-     */
-    private suspend fun startEnhancedMock() {
-        while (isRunning) {
-            try {
-                // 生成微坐标抖动（5米范围内）
-                val jitterLat = generateCoordinateJitter()
-                val jitterLng = generateCoordinateJitter()
-                
-                val mockLat = targetLatitude + jitterLat
-                val mockLng = targetLongitude + jitterLng
-                
-                setMockLocation(mockLat, mockLng, generateDynamicAccuracy())
-                delay(50) // 50ms更新间隔
-            } catch (e: Exception) {
-                Log.e(TAG, "增强模式模拟失败: ${e.message}")
-                break
-            }
-        }
-    }
+
     
     /**
      * 设置模拟位置
@@ -237,20 +210,7 @@ class LocationMockService : Service() {
         }
     }
     
-    /**
-     * 生成坐标抖动（约5米范围）
-     */
-    private fun generateCoordinateJitter(): Double {
-        // 1度约等于111km，5米约等于0.000045度
-        return (Random.nextDouble() - 0.5) * 0.00009
-    }
-    
-    /**
-     * 生成动态精度值
-     */
-    private fun generateDynamicAccuracy(): Float {
-        return Random.nextFloat() * 10f + 5f // 5-15米精度范围
-    }
+
     
     override fun onDestroy() {
         super.onDestroy()

@@ -63,7 +63,7 @@ jobs:
         echo "验证keystore信息:"
         keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey
 
-    - name: 输出构建信息 (编译前)
+    - name: 输出SHA1信息
       run: |
         # 确保debug.keystore存在
         if [ ! -f ~/.android/debug.keystore ]; then
@@ -71,14 +71,12 @@ jobs:
           keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" >/dev/null 2>&1
         fi
 
-        # 获取SHA1值
+        # 获取debug keystore的SHA1值（用于百度地图API申请）
         SHA1_VALUE=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
-        MD5_VALUE=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "MD5:" | head -1 | sed 's/.*MD5: //' | tr -d ' ')
 
-        # 只输出包名和SHA1
+        # 输出包名和SHA1信息
         echo "包名: com.dinghong.locationmock"
         echo "SHA1: $SHA1_VALUE"
-        echo "MD5: $MD5_VALUE"
 
     - name: 构建 Debug APK
       run: |
