@@ -126,6 +126,12 @@ fun BaiduMapView(
                     textAlign = TextAlign.Center
                 )
                 Text(
+                    text = "⚠️ 当前为模拟模式",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Yellow,
+                    textAlign = TextAlign.Center
+                )
+                Text(
                     text = "点击选择位置 • 缩放级别: ${String.format("%.1f", currentZoom)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
@@ -160,9 +166,24 @@ fun BaiduMapView(
 
     // 模拟地图准备完成回调
     LaunchedEffect(Unit) {
-        // 模拟地图初始化过程
-        kotlinx.coroutines.delay(500) // 模拟加载时间
-        onMapReady(BaiduMap())
-        android.util.Log.i("BaiduMapView", "模拟地图组件初始化完成")
+        android.util.Log.i("BaiduMapView", "开始初始化百度地图组件...")
+        android.util.Log.w("BaiduMapView", "注意：当前使用模拟地图，真实百度地图SDK未集成")
+
+        try {
+            // 模拟地图初始化过程
+            android.util.Log.i("BaiduMapView", "正在加载地图资源...")
+            kotlinx.coroutines.delay(300)
+
+            android.util.Log.i("BaiduMapView", "正在初始化地图引擎...")
+            kotlinx.coroutines.delay(200)
+
+            android.util.Log.i("BaiduMapView", "地图引擎初始化完成，创建地图实例...")
+            onMapReady(BaiduMap())
+
+            android.util.Log.i("BaiduMapView", "✅ 模拟地图组件初始化成功")
+            android.util.Log.i("BaiduMapView", "地图状态：模拟模式 - 可以点击选择位置")
+        } catch (e: Exception) {
+            android.util.Log.e("BaiduMapView", "❌ 地图初始化失败: ${e.message}")
+        }
     }
 }

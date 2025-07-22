@@ -152,6 +152,7 @@ class MainViewModel : ViewModel() {
         
         addDebugLog("定红定位模拟器已启动", "SUCCESS")
         addDebugLog("正在初始化地图组件...", "INFO")
+        addDebugLog("注意：当前使用模拟地图，真实百度地图SDK未集成", "WARNING")
 
         // 设置默认位置（北京天安门）
         val defaultLocation = LatLng(39.904200, 116.407400)
@@ -169,9 +170,17 @@ class MainViewModel : ViewModel() {
      * 地图准备完成
      */
     fun onMapReady(baiduMap: BaiduMap) {
-        mapInteractionManager.initializeMap(baiduMap)
-        addDebugLog("地图组件初始化完成", "SUCCESS")
-        addDebugLog("可以点击地图选择位置或输入坐标", "INFO")
+        try {
+            addDebugLog("正在配置地图交互管理器...", "INFO")
+            mapInteractionManager.initializeMap(baiduMap)
+
+            addDebugLog("✅ 地图组件初始化完成", "SUCCESS")
+            addDebugLog("地图状态：模拟模式 - 网格背景显示", "INFO")
+            addDebugLog("📍 可以点击地图选择位置或输入坐标", "INFO")
+            addDebugLog("🎯 当前默认位置：北京天安门", "INFO")
+        } catch (e: Exception) {
+            addDebugLog("❌ 地图初始化失败: ${e.message}", "ERROR")
+        }
     }
     
     /**
@@ -186,8 +195,9 @@ class MainViewModel : ViewModel() {
             currentCoordinate = formatCoordinate(latLng)
         )
 
-        addDebugLog("选择位置: ${String.format("%.6f", latLng.latitude)}, ${String.format("%.6f", latLng.longitude)}", "SUCCESS")
-        addDebugLog("现在可以点击'开始模拟'按钮", "INFO")
+        addDebugLog("📍 选择位置: ${String.format("%.6f", latLng.latitude)}, ${String.format("%.6f", latLng.longitude)}", "SUCCESS")
+        addDebugLog("🎯 位置已设置，现在可以点击'开始模拟'按钮", "INFO")
+        addDebugLog("💡 提示：当前为模拟地图，实际使用需要真实百度地图SDK", "WARNING")
 
         // 显示坐标转换信息
         val conversions = mapInteractionManager.getCoordinateConversions(latLng)
@@ -550,6 +560,7 @@ class MainViewModel : ViewModel() {
         // 同时输出到系统日志
         when (type) {
             "ERROR" -> Log.e(TAG, message)
+            "WARNING" -> Log.w(TAG, message)
             "SUCCESS" -> Log.i(TAG, message)
             "COORDINATE" -> Log.d(TAG, message)
             else -> Log.i(TAG, message)
