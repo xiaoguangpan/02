@@ -24,6 +24,17 @@ data class GeoCoder(val dummy: String = "placeholder")
 data class PoiSearch(val dummy: String = "placeholder")
 
 /**
+ * 搜索结果项数据类
+ * 用于搜索建议列表显示
+ */
+data class SearchResultItem(
+    val name: String,           // 位置名称
+    val address: String,        // 完整地址
+    val location: LatLng,       // 坐标位置
+    val type: String            // 位置类型（如"景点"、"商圈"等）
+)
+
+/**
  * 地图交互管理器
  * 负责处理地图点击、搜索、标记显示等交互功能
  */
