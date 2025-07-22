@@ -17,6 +17,7 @@ import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.manager.FavoriteManager
 import com.dinghong.locationmock.data.FavoriteLocation
+import com.dinghong.locationmock.manager.SearchResultItem
 import com.dinghong.locationmock.utils.PermissionHelper
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -60,7 +61,11 @@ class MainViewModel : ViewModel() {
         val isSearching: Boolean = false,
         val hasLocationPermission: Boolean = false,
         val hasMockLocationPermission: Boolean = false,
-        val favoriteLocations: List<FavoriteLocation> = emptyList()
+        val favoriteLocations: List<FavoriteLocation> = emptyList(),
+        val searchSuggestions: List<SearchResultItem> = emptyList(),
+        val showPermissionErrorDialog: Boolean = false,
+        val permissionErrorTitle: String = "",
+        val permissionErrorMessage: String = ""
     )
     
     /**
@@ -117,6 +122,13 @@ class MainViewModel : ViewModel() {
                 _uiState.value = _uiState.value.copy(favoriteLocations = favorites)
             }
         }
+
+        // 监听搜索结果
+        viewModelScope.launch {
+            mapInteractionManager.searchResults.collect { results ->
+                _uiState.value = _uiState.value.copy(searchSuggestions = results)
+            }
+        }
         
         addDebugLog("定红定位模拟器已启动")
 
@@ -162,6 +174,20 @@ class MainViewModel : ViewModel() {
             addDebugLog("搜索: $searchText")
         }
     }
+
+    /**
+     * 处理搜索建议点击
+     */
+    fun onSearchSuggestionClick(suggestion: SearchResultItem) {
+        // 移动到选中位置
+        mapInteractionManager.moveToLocation(suggestion.location)
+        // 清空搜索文本和建议
+        _uiState.value = _uiState.value.copy(
+            searchText = "",
+            searchSuggestions = emptyList()
+        )
+        addDebugLog("选择搜索建议: ${suggestion.name}")
+    }
     
     /**
      * 获取当前位置
@@ -205,16 +231,24 @@ class MainViewModel : ViewModel() {
                 addDebugLog("位置模拟已启动", "SUCCESS")
             } else {
                 addDebugLog("启动位置模拟失败，请检查权限设置", "ERROR")
+                showPermissionError()
             }
         }
     }
     
     /**
-     * 显示添加收藏对话框
+     * 直接添加收藏（简化流程）
      */
     fun showAddFavoriteDialog() {
-        if (_uiState.value.selectedLocation != null) {
-            _uiState.value = _uiState.value.copy(showAddFavoriteDialog = true)
+        val selectedLocation = _uiState.value.selectedLocation
+        if (selectedLocation != null) {
+            // 自动生成收藏名称
+            val timestamp = java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+            val name = "位置 $timestamp"
+            val address = "坐标: ${String.format("%.6f, %.6f", selectedLocation.latitude, selectedLocation.longitude)}"
+
+            favoriteManager.addFavorite(name, address, selectedLocation)
+            addDebugLog("已添加收藏: $name")
         } else {
             addDebugLog("请先选择位置")
         }
@@ -268,6 +302,58 @@ class MainViewModel : ViewModel() {
     fun deleteFavorite(favoriteId: String) {
         favoriteManager.removeFavorite(favoriteId)
         addDebugLog("已删除收藏")
+    }
+
+    /**
+     * 显示权限错误提示
+     */
+    private fun showPermissionError() {
+        val hasLocationPermission = _uiState.value.hasLocationPermission
+        val hasMockPermission = _uiState.value.hasMockLocationPermission
+
+        val (title, message) = when {
+            !hasLocationPermission && !hasMockPermission -> {
+                "权限不足" to "需要位置权限和模拟位置权限才能开始位置模拟。\n\n请点击右上角的权限图标进行设置。"
+            }
+            !hasLocationPermission -> {
+                "缺少位置权限" to "需要位置权限才能开始位置模拟。\n\n请点击右上角的位置权限图标进行设置。"
+            }
+            !hasMockPermission -> {
+                "缺少模拟位置权限" to "需要在开发者选项中设置本应用为模拟位置应用。\n\n请点击右上角的模拟权限图标进行设置。"
+            }
+            else -> {
+                "模拟失败" to "位置模拟启动失败，请检查权限设置或重试。"
+            }
+        }
+
+        _uiState.value = _uiState.value.copy(
+            showPermissionErrorDialog = true,
+            permissionErrorTitle = title,
+            permissionErrorMessage = message
+        )
+    }
+
+    /**
+     * 隐藏权限错误对话框
+     */
+    fun hidePermissionErrorDialog() {
+        _uiState.value = _uiState.value.copy(showPermissionErrorDialog = false)
+    }
+
+    /**
+     * 处理位置权限点击
+     */
+    fun onLocationPermissionClick() {
+        // TODO: 请求位置权限
+        addDebugLog("请求位置权限")
+    }
+
+    /**
+     * 处理模拟权限点击
+     */
+    fun onMockPermissionClick() {
+        // TODO: 跳转到开发者选项
+        addDebugLog("跳转到开发者选项")
     }
     
     /**

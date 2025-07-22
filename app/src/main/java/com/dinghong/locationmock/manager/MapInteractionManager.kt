@@ -58,8 +58,8 @@ class MapInteractionManager(private val context: Context) {
     )
     
     /**
-     * 初始化地图（临时简化版本）
-     * TODO: 添加百度地图SDK后完善
+     * 初始化地图（模拟版本）
+     * 注意：当前使用模拟地图组件，等待百度地图SDK集成
      */
     fun initializeMap(map: BaiduMap) {
         this.baiduMap = map
@@ -68,7 +68,7 @@ class MapInteractionManager(private val context: Context) {
         // geocodeSearch = GeoCoder.newInstance()
         // poiSearch = PoiSearch.newInstance()
 
-        Log.i(TAG, "地图交互管理器已初始化（简化版本）")
+        Log.i(TAG, "模拟地图组件已初始化，等待百度地图SDK集成")
     }
     
     /**
@@ -85,7 +85,7 @@ class MapInteractionManager(private val context: Context) {
     }
     
     /**
-     * 执行地址搜索（临时简化版本）
+     * 执行地址搜索（增强模拟版本）
      */
     fun searchAddress(query: String) {
         if (query.isBlank()) {
@@ -99,17 +99,52 @@ class MapInteractionManager(private val context: Context) {
         if (isCoordinateFormat(query)) {
             handleCoordinateInput(query)
         } else {
-            // 临时模拟搜索结果
-            _searchResults.value = listOf(
-                SearchResultItem(
-                    name = "搜索结果: $query",
-                    address = "模拟地址（需要百度地图SDK）",
-                    location = LatLng(39.915, 116.404),
-                    type = "模拟"
-                )
-            )
+            // 增强的模拟搜索结果，提供更真实的建议
+            val suggestions = generateSearchSuggestions(query)
+            _searchResults.value = suggestions
             _isSearching.value = false
         }
+    }
+
+    /**
+     * 生成搜索建议（模拟百度地图API响应）
+     */
+    private fun generateSearchSuggestions(query: String): List<SearchResultItem> {
+        val suggestions = mutableListOf<SearchResultItem>()
+
+        // 基于查询词生成相关建议
+        when {
+            query.contains("北京", ignoreCase = true) || query.contains("beijing", ignoreCase = true) -> {
+                suggestions.addAll(listOf(
+                    SearchResultItem("北京天安门广场", "北京市东城区东长安街", LatLng(39.9042, 116.4074), "景点"),
+                    SearchResultItem("北京故宫博物院", "北京市东城区景山前街4号", LatLng(39.9163, 116.3972), "景点"),
+                    SearchResultItem("北京王府井大街", "北京市东城区王府井大街", LatLng(39.9097, 116.4142), "商业区")
+                ))
+            }
+            query.contains("上海", ignoreCase = true) || query.contains("shanghai", ignoreCase = true) -> {
+                suggestions.addAll(listOf(
+                    SearchResultItem("上海外滩", "上海市黄浦区中山东一路", LatLng(31.2397, 121.4990), "景点"),
+                    SearchResultItem("上海东方明珠", "上海市浦东新区世纪大道1号", LatLng(31.2397, 121.4990), "景点"),
+                    SearchResultItem("上海南京路步行街", "上海市黄浦区南京东路", LatLng(31.2342, 121.4707), "商业区")
+                ))
+            }
+            query.contains("广州", ignoreCase = true) || query.contains("guangzhou", ignoreCase = true) -> {
+                suggestions.addAll(listOf(
+                    SearchResultItem("广州塔", "广州市海珠区阅江西路222号", LatLng(23.1081, 113.3245), "景点"),
+                    SearchResultItem("广州白云山", "广州市白云区广园中路801号", LatLng(23.1693, 113.2927), "景点")
+                ))
+            }
+            else -> {
+                // 通用搜索建议
+                suggestions.addAll(listOf(
+                    SearchResultItem("$query - 地点1", "模拟地址：${query}附近", LatLng(39.915 + Math.random() * 0.01, 116.404 + Math.random() * 0.01), "地点"),
+                    SearchResultItem("$query - 地点2", "模拟地址：${query}周边", LatLng(39.915 + Math.random() * 0.01, 116.404 + Math.random() * 0.01), "地点"),
+                    SearchResultItem("$query - 商圈", "模拟商圈：${query}商业区", LatLng(39.915 + Math.random() * 0.01, 116.404 + Math.random() * 0.01), "商圈")
+                ))
+            }
+        }
+
+        return suggestions.take(5) // 最多返回5个建议
     }
     
     /**
@@ -140,16 +175,16 @@ class MapInteractionManager(private val context: Context) {
     }
     
     /**
-     * 缩放地图（临时简化版本）
+     * 缩放地图（模拟版本）
      */
     fun zoomIn() {
-        // 临时注释地图缩放操作
-        Log.i(TAG, "地图放大")
+        // 模拟地图缩放操作
+        Log.i(TAG, "🔍 地图放大 - 模拟操作")
     }
 
     fun zoomOut() {
-        // 临时注释地图缩放操作
-        Log.i(TAG, "地图缩小")
+        // 模拟地图缩放操作
+        Log.i(TAG, "🔍 地图缩小 - 模拟操作")
     }
 
     /**

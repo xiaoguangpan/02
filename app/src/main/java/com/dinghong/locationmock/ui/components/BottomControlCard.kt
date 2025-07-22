@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dinghong.locationmock.ui.theme.ControlCardBackground
+import com.dinghong.locationmock.manager.SearchResultItem
 
 /**
  * 底部控制卡片
@@ -31,7 +32,9 @@ fun BottomControlCard(
     onSimulateToggle: () -> Unit = {},
     onAddFavoriteClick: () -> Unit = {},
     onShowFavoritesClick: () -> Unit = {},
-    currentCoordinate: String = ""
+    currentCoordinate: String = "",
+    searchSuggestions: List<SearchResultItem> = emptyList(),
+    onSuggestionClick: (SearchResultItem) -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -49,16 +52,27 @@ fun BottomControlCard(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // 搜索框
-            SearchInputField(
-                searchText = searchText,
-                onSearchTextChange = onSearchTextChange,
-                onSearchSubmit = onSearchSubmit
-            )
-            
-            // 当前坐标显示
+            // 当前坐标显示（移到顶部）
             if (currentCoordinate.isNotEmpty()) {
                 CoordinateDisplay(coordinate = currentCoordinate)
+            }
+
+            // 搜索框和建议列表
+            Column {
+                SearchInputField(
+                    searchText = searchText,
+                    onSearchTextChange = onSearchTextChange,
+                    onSearchSubmit = onSearchSubmit
+                )
+
+                // 搜索建议列表
+                if (searchSuggestions.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    SearchSuggestionList(
+                        suggestions = searchSuggestions,
+                        onSuggestionClick = onSuggestionClick
+                    )
+                }
             }
             
             // 控制按钮行

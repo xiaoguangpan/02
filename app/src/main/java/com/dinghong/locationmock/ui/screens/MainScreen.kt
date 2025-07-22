@@ -21,6 +21,7 @@ import com.dinghong.locationmock.ui.components.FloatingControls
 import com.dinghong.locationmock.ui.components.HelpDialog
 import com.dinghong.locationmock.ui.components.AddFavoriteDialog
 import com.dinghong.locationmock.ui.components.FavoriteDialog
+import com.dinghong.locationmock.ui.components.PermissionErrorDialog
 import com.dinghong.locationmock.viewmodel.MainViewModel
 
 /**
@@ -75,7 +76,9 @@ fun MainScreen(
             onSimulateToggle = { viewModel.toggleSimulation() },
             onAddFavoriteClick = { viewModel.showAddFavoriteDialog() },
             onShowFavoritesClick = { viewModel.showFavoriteListDialog() },
-            currentCoordinate = uiState.currentCoordinate
+            currentCoordinate = uiState.currentCoordinate,
+            searchSuggestions = uiState.searchSuggestions,
+            onSuggestionClick = { viewModel.onSearchSuggestionClick(it) }
         )
         
         // 调试面板（如果显示）
@@ -89,7 +92,9 @@ fun MainScreen(
                 debugLogs = uiState.debugLogs,
                 onClose = { viewModel.hideDebugPanel() },
                 onClearLogs = { viewModel.clearDebugLogs() },
-                onCopyLogs = { viewModel.copyDebugLogs(context) }
+                onCopyLogs = { viewModel.copyDebugLogs(context) },
+                isExpanded = true, // 默认展开
+                onToggleExpand = { /* TODO: 实现展开/收缩逻辑 */ }
             )
         }
 
@@ -98,9 +103,10 @@ fun MainScreen(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp),
-            isSimulating = uiState.isSimulating,
             hasLocationPermission = uiState.hasLocationPermission,
-            hasMockLocationPermission = uiState.hasMockLocationPermission
+            hasMockLocationPermission = uiState.hasMockLocationPermission,
+            onLocationPermissionClick = { viewModel.onLocationPermissionClick() },
+            onMockPermissionClick = { viewModel.onMockPermissionClick() }
         )
 
         // 帮助对话框（如果显示）
@@ -110,14 +116,7 @@ fun MainScreen(
             )
         }
 
-        // 添加收藏对话框（如果显示）
-        if (uiState.showAddFavoriteDialog && uiState.selectedLocation != null) {
-            AddFavoriteDialog(
-                latLng = uiState.selectedLocation!!,
-                onDismiss = { viewModel.hideAddFavoriteDialog() },
-                onConfirm = { name, address -> viewModel.addFavorite(name, address) }
-            )
-        }
+
 
         // 收藏列表对话框（如果显示）
         if (uiState.showFavoriteListDialog) {
@@ -126,6 +125,24 @@ fun MainScreen(
                 onDismiss = { viewModel.hideFavoriteListDialog() },
                 onSelectFavorite = { favorite -> viewModel.selectFavoriteLocation(favorite) },
                 onDeleteFavorite = { favoriteId -> viewModel.deleteFavorite(favoriteId) }
+            )
+        }
+
+        // 权限错误对话框（如果显示）
+        if (uiState.showPermissionErrorDialog) {
+            PermissionErrorDialog(
+                title = uiState.permissionErrorTitle,
+                message = uiState.permissionErrorMessage,
+                onDismiss = { viewModel.hidePermissionErrorDialog() },
+                onConfirm = {
+                    viewModel.hidePermissionErrorDialog()
+                    // 根据错误类型执行相应操作
+                    if (uiState.permissionErrorMessage.contains("位置权限")) {
+                        viewModel.onLocationPermissionClick()
+                    } else if (uiState.permissionErrorMessage.contains("模拟权限")) {
+                        viewModel.onMockPermissionClick()
+                    }
+                }
             )
         }
     }

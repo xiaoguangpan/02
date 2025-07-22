@@ -1,6 +1,7 @@
 package com.dinghong.locationmock.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -144,7 +145,7 @@ private fun DebugPanelHeader(
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Clear,
+                    imageVector = Icons.Default.Delete,
                     contentDescription = "清除日志",
                     tint = DebugLogWarning,
                     modifier = Modifier.size(18.dp)
@@ -318,9 +319,10 @@ private fun getLogIcon(log: String): androidx.compose.ui.graphics.vector.ImageVe
  */
 @Composable
 fun DebugStatusIndicator(
-    isSimulating: Boolean,
     hasLocationPermission: Boolean,
     hasMockLocationPermission: Boolean,
+    onLocationPermissionClick: () -> Unit,
+    onMockPermissionClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -328,31 +330,24 @@ fun DebugStatusIndicator(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 模拟状态指示
-        StatusIndicatorItem(
-            icon = if (isSimulating) Icons.Default.PlayArrow else Icons.Default.Stop,
-            label = "模拟",
-            isActive = isSimulating,
-            activeColor = DebugLogSuccess,
-            inactiveColor = Color.Gray
-        )
-        
-        // 位置权限状态
+        // 位置权限状态（可点击）
         StatusIndicatorItem(
             icon = Icons.Default.LocationOn,
             label = "位置权限",
             isActive = hasLocationPermission,
             activeColor = DebugLogSuccess,
-            inactiveColor = DebugLogError
+            inactiveColor = DebugLogError,
+            onClick = onLocationPermissionClick
         )
-        
-        // 模拟位置权限状态
+
+        // 模拟位置权限状态（可点击）
         StatusIndicatorItem(
             icon = Icons.Default.DeveloperMode,
             label = "模拟权限",
             isActive = hasMockLocationPermission,
             activeColor = DebugLogSuccess,
-            inactiveColor = DebugLogError
+            inactiveColor = DebugLogError,
+            onClick = onMockPermissionClick
         )
     }
 }
@@ -366,11 +361,17 @@ private fun StatusIndicatorItem(
     label: String,
     isActive: Boolean,
     activeColor: Color,
-    inactiveColor: Color
+    inactiveColor: Color,
+    onClick: (() -> Unit)? = null
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        modifier = if (onClick != null) {
+            Modifier.clickable { onClick() }
+        } else {
+            Modifier
+        }
     ) {
         Icon(
             imageVector = icon,

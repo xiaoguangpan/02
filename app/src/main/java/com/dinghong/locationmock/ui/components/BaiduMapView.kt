@@ -120,20 +120,6 @@ fun BaiduMapView(
                     color = Color.Gray,
                     textAlign = TextAlign.Center
                 )
-                if (selectedLocation != null) {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Black.copy(alpha = 0.7f)
-                        )
-                    ) {
-                        Text(
-                            text = "已选择: ${String.format("%.6f, %.6f", selectedLocation!!.latitude, selectedLocation!!.longitude)}",
-                            modifier = Modifier.padding(8.dp),
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
             }
 
             // 选中位置标记

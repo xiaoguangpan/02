@@ -71,12 +71,21 @@ jobs:
           keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" >/dev/null 2>&1
         fi
 
-        # 获取debug keystore的SHA1值（用于百度地图API申请）
-        SHA1_VALUE=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
+        # 获取debug keystore的SHA1值
+        DEBUG_SHA1=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
 
-        # 输出包名和SHA1信息
+        # 创建release keystore（用于release版本）
+        if [ ! -f ~/.android/release.keystore ]; then
+          keytool -genkey -v -keystore ~/.android/release.keystore -storepass release123 -alias releasekey -keypass release123 -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=reding Release,O=reding,C=CN" >/dev/null 2>&1
+        fi
+
+        # 获取release keystore的SHA1值
+        RELEASE_SHA1=$(keytool -list -v -keystore ~/.android/release.keystore -alias releasekey -storepass release123 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
+
+        # 输出包名和双版本SHA1信息
         echo "包名: com.dinghong.locationmock"
-        echo "SHA1: $SHA1_VALUE"
+        echo "Debug SHA1: $DEBUG_SHA1"
+        echo "Release SHA1: $RELEASE_SHA1"
 
     - name: 构建 Debug APK
       run: |
