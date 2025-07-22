@@ -24,6 +24,7 @@ import com.dinghong.locationmock.ui.theme.*
  * 专业调试面板组件
  * 提供彩色日志显示、实时状态监控、调试信息复制导出等功能
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebugPanel(
     modifier: Modifier = Modifier,

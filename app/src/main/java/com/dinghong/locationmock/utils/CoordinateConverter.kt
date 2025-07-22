@@ -1,12 +1,13 @@
 package com.dinghong.locationmock.utils
 
+import kotlin.math.*
+
 // 临时注释百度地图SDK导入
 // import com.baidu.mapapi.model.LatLng
 // import com.baidu.mapapi.utils.CoordinateConverter
 
 // 临时数据类定义
 data class LatLng(val latitude: Double, val longitude: Double)
-import kotlin.math.*
 
 /**
  * 坐标系转换工具类

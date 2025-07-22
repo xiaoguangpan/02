@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 // import com.baidu.mapapi.map.*
 // import com.baidu.mapapi.model.LatLng
 
-// 临时数据类，替代百度地图的LatLng
-data class LatLng(val latitude: Double, val longitude: Double)
-data class BaiduMap(val dummy: String = "placeholder")
+// 使用manager包中的统一类型定义
+import com.dinghong.locationmock.manager.LatLng
+import com.dinghong.locationmock.manager.BaiduMap
 
 /**
  * 百度地图Compose组件（临时占位版本）

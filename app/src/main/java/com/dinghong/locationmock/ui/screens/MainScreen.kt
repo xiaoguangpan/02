@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 // import com.baidu.mapapi.map.BaiduMap
 // import com.baidu.mapapi.model.LatLng
-import com.dinghong.locationmock.ui.components.BaiduMap
-import com.dinghong.locationmock.ui.components.LatLng
+import com.dinghong.locationmock.manager.BaiduMap
+import com.dinghong.locationmock.manager.LatLng
 import com.dinghong.locationmock.ui.components.BaiduMapView
 import com.dinghong.locationmock.ui.components.BottomControlCard
 import com.dinghong.locationmock.ui.components.DebugPanel
