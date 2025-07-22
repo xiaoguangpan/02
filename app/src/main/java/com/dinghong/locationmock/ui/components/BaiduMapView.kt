@@ -120,7 +120,7 @@ fun BaiduMapView(
                     color = Color.White.copy(alpha = 0.9f)
                 )
                 Text(
-                    text = "地图加载中...",
+                    text = "模拟地图已就绪",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     textAlign = TextAlign.Center

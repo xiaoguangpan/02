@@ -102,7 +102,7 @@ private fun SearchInputField(
         modifier = Modifier.fillMaxWidth(),
         placeholder = {
             Text(
-                "地址或坐标",
+                "输入地址或坐标 (如: 39.9042,116.4074)",
                 color = Color.Gray,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -176,8 +176,9 @@ private fun ControlButtonsRow(
             onClick = onSimulateToggle,
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isSimulating) Color(0xFFFF5722) else MaterialTheme.colorScheme.primary
-            )
+                containerColor = if (isSimulating) Color(0xFFE53E3E) else Color(0xFF38A169)
+            ),
+            shape = RoundedCornerShape(12.dp)
         ) {
             Icon(
                 imageVector = if (isSimulating) Icons.Default.Stop else Icons.Default.PlayArrow,
@@ -185,7 +186,10 @@ private fun ControlButtonsRow(
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text(if (isSimulating) "停止模拟" else "开始模拟")
+            Text(
+                text = if (isSimulating) "停止模拟" else "开始模拟",
+                color = Color.White
+            )
         }
 
         // 添加收藏按钮
@@ -193,14 +197,14 @@ private fun ControlButtonsRow(
             onClick = onAddFavoriteClick,
             modifier = Modifier
                 .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.secondary)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFFED8936))
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                imageVector = Icons.Default.Favorite,
                 contentDescription = "添加收藏",
                 tint = Color.White,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
 
@@ -209,14 +213,14 @@ private fun ControlButtonsRow(
             onClick = onShowFavoritesClick,
             modifier = Modifier
                 .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.tertiary)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF4299E1))
         ) {
             Icon(
-                imageVector = Icons.Default.List,
+                imageVector = Icons.Default.BookmarkBorder,
                 contentDescription = "收藏列表",
                 tint = Color.White,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
     }

@@ -195,10 +195,37 @@ class MainViewModel : ViewModel() {
      * 执行搜索
      */
     fun performSearch() {
-        val searchText = _uiState.value.searchText
+        val searchText = _uiState.value.searchText.trim()
         if (searchText.isNotBlank()) {
-            mapInteractionManager.searchAddress(searchText)
-            addDebugLog("搜索: $searchText")
+            // 检查是否为坐标格式 (纬度,经度)
+            val coordinatePattern = Regex("""^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$""")
+            val matchResult = coordinatePattern.find(searchText)
+
+            if (matchResult != null) {
+                // 处理坐标输入
+                try {
+                    val lat = matchResult.groupValues[1].toDouble()
+                    val lng = matchResult.groupValues[2].toDouble()
+
+                    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        val latLng = LatLng(lat, lng)
+                        mapInteractionManager.moveToLocation(latLng)
+                        _uiState.value = _uiState.value.copy(
+                            searchText = "",
+                            searchSuggestions = emptyList()
+                        )
+                        addDebugLog("移动到坐标: $lat, $lng")
+                    } else {
+                        addDebugLog("坐标超出有效范围")
+                    }
+                } catch (e: NumberFormatException) {
+                    addDebugLog("坐标格式错误")
+                }
+            } else {
+                // 处理地址搜索
+                mapInteractionManager.searchAddress(searchText)
+                addDebugLog("搜索地址: $searchText")
+            }
         }
     }
 
