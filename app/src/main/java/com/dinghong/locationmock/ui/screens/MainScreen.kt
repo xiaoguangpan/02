@@ -22,6 +22,7 @@ import com.dinghong.locationmock.ui.components.HelpDialog
 import com.dinghong.locationmock.ui.components.AddFavoriteDialog
 import com.dinghong.locationmock.ui.components.FavoriteDialog
 import com.dinghong.locationmock.ui.components.PermissionErrorDialog
+import com.dinghong.locationmock.manager.PermissionManager
 import com.dinghong.locationmock.viewmodel.MainViewModel
 
 /**
@@ -31,14 +32,16 @@ import com.dinghong.locationmock.viewmodel.MainViewModel
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = viewModel(),
+    permissionManager: PermissionManager? = null,
+    onRequestPermissions: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
     // 初始化ViewModel
     LaunchedEffect(Unit) {
-        viewModel.initialize(context)
+        viewModel.initialize(context, permissionManager)
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -92,9 +95,7 @@ fun MainScreen(
                 debugLogs = uiState.debugLogs,
                 onClose = { viewModel.hideDebugPanel() },
                 onClearLogs = { viewModel.clearDebugLogs() },
-                onCopyLogs = { viewModel.copyDebugLogs(context) },
-                isExpanded = true, // 默认展开
-                onToggleExpand = { /* TODO: 实现展开/收缩逻辑 */ }
+                onCopyLogs = { viewModel.copyDebugLogs(context) }
             )
         }
 

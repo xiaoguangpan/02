@@ -57,6 +57,9 @@ class MapInteractionManager(private val context: Context) {
     
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
+
+    private val _zoomLevel = MutableStateFlow(15f)
+    val zoomLevel: StateFlow<Float> = _zoomLevel.asStateFlow()
     
 
     
@@ -178,16 +181,20 @@ class MapInteractionManager(private val context: Context) {
     }
     
     /**
-     * 缩放地图（模拟版本）
+     * 缩放地图（增强模拟版本）
      */
     fun zoomIn() {
-        // 模拟地图缩放操作
-        Log.i(TAG, "🔍 地图放大 - 模拟操作")
+        val currentZoom = _zoomLevel.value
+        val newZoom = (currentZoom + 1f).coerceAtMost(21f)
+        _zoomLevel.value = newZoom
+        Log.i(TAG, "🔍 地图放大 - 缩放级别: $newZoom")
     }
 
     fun zoomOut() {
-        // 模拟地图缩放操作
-        Log.i(TAG, "🔍 地图缩小 - 模拟操作")
+        val currentZoom = _zoomLevel.value
+        val newZoom = (currentZoom - 1f).coerceAtLeast(3f)
+        _zoomLevel.value = newZoom
+        Log.i(TAG, "🔍 地图缩小 - 缩放级别: $newZoom")
     }
 
     /**

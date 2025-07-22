@@ -33,9 +33,7 @@ fun DebugPanel(
     debugLogs: List<String>,
     onClose: () -> Unit,
     onClearLogs: () -> Unit,
-    onCopyLogs: () -> Unit,
-    isExpanded: Boolean = true,
-    onToggleExpand: () -> Unit = {}
+    onCopyLogs: () -> Unit
 ) {
     Card(
         modifier = modifier,
@@ -55,8 +53,6 @@ fun DebugPanel(
                 onClose = onClose,
                 onClearLogs = onClearLogs,
                 onCopyLogs = onCopyLogs,
-                isExpanded = isExpanded,
-                onToggleExpand = onToggleExpand,
                 logCount = debugLogs.size
             )
             
@@ -81,8 +77,6 @@ private fun DebugPanelHeader(
     onClose: () -> Unit,
     onClearLogs: () -> Unit,
     onCopyLogs: () -> Unit,
-    isExpanded: Boolean,
-    onToggleExpand: () -> Unit,
     logCount: Int
 ) {
     Row(
@@ -127,18 +121,6 @@ private fun DebugPanelHeader(
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // 展开/收起按钮
-            IconButton(
-                onClick = onToggleExpand,
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "收起" else "展开",
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-            
             // 清除日志按钮
             IconButton(
                 onClick = onClearLogs,

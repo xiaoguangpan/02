@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 // 临时注释百度地图SDK导入
@@ -16,6 +17,7 @@ import com.dinghong.locationmock.manager.BaiduMap
 import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.manager.FavoriteManager
+import com.dinghong.locationmock.manager.PermissionManager
 import com.dinghong.locationmock.data.FavoriteLocation
 import com.dinghong.locationmock.manager.SearchResultItem
 import com.dinghong.locationmock.utils.PermissionHelper
@@ -37,6 +39,8 @@ class MainViewModel : ViewModel() {
     private lateinit var locationMockManager: LocationMockManager
     private lateinit var mapInteractionManager: MapInteractionManager
     private lateinit var favoriteManager: FavoriteManager
+    private var permissionManager: PermissionManager? = null
+    private lateinit var context: Context
     
     // UI状态
     private val _uiState = MutableStateFlow(MainUiState())
@@ -71,10 +75,12 @@ class MainViewModel : ViewModel() {
     /**
      * 初始化ViewModel
      */
-    fun initialize(context: Context) {
+    fun initialize(context: Context, permissionManager: PermissionManager? = null) {
+        this.context = context
         locationMockManager = LocationMockManager(context)
         mapInteractionManager = MapInteractionManager(context)
         favoriteManager = FavoriteManager(context)
+        this.permissionManager = permissionManager
         
         // 检查权限状态
         checkPermissions(context)
@@ -127,6 +133,20 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             mapInteractionManager.searchResults.collect { results ->
                 _uiState.value = _uiState.value.copy(searchSuggestions = results)
+            }
+        }
+
+        // 监听权限状态
+        permissionManager?.let { manager ->
+            viewModelScope.launch {
+                manager.hasLocationPermission.collect { hasPermission ->
+                    _uiState.value = _uiState.value.copy(hasLocationPermission = hasPermission)
+                }
+            }
+            viewModelScope.launch {
+                manager.hasMockLocationPermission.collect { hasPermission ->
+                    _uiState.value = _uiState.value.copy(hasMockLocationPermission = hasPermission)
+                }
             }
         }
         
@@ -248,6 +268,7 @@ class MainViewModel : ViewModel() {
             val address = "坐标: ${String.format("%.6f, %.6f", selectedLocation.latitude, selectedLocation.longitude)}"
 
             favoriteManager.addFavorite(name, address, selectedLocation)
+            Toast.makeText(context, "收藏成功!", Toast.LENGTH_SHORT).show()
             addDebugLog("已添加收藏: $name")
         } else {
             addDebugLog("请先选择位置")
@@ -301,6 +322,7 @@ class MainViewModel : ViewModel() {
      */
     fun deleteFavorite(favoriteId: String) {
         favoriteManager.removeFavorite(favoriteId)
+        Toast.makeText(context, "删除成功!", Toast.LENGTH_SHORT).show()
         addDebugLog("已删除收藏")
     }
 
@@ -344,16 +366,16 @@ class MainViewModel : ViewModel() {
      * 处理位置权限点击
      */
     fun onLocationPermissionClick() {
-        // TODO: 请求位置权限
-        addDebugLog("请求位置权限")
+        permissionManager?.openAppSettings()
+        addDebugLog("打开应用设置页面")
     }
 
     /**
      * 处理模拟权限点击
      */
     fun onMockPermissionClick() {
-        // TODO: 跳转到开发者选项
-        addDebugLog("跳转到开发者选项")
+        permissionManager?.openDeveloperSettings()
+        addDebugLog("打开开发者选项页面")
     }
     
     /**

@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -27,8 +28,8 @@ import com.dinghong.locationmock.manager.LatLng
 import com.dinghong.locationmock.manager.BaiduMap
 
 /**
- * 百度地图Compose组件（增强占位版本）
- * 支持点击交互，等待百度地图SDK集成
+ * 百度地图Compose组件（准备SDK集成版本）
+ * 支持点击交互，缩放控制，为真实地图SDK做准备
  */
 @Composable
 fun BaiduMapView(
@@ -37,43 +38,53 @@ fun BaiduMapView(
     onMapClick: (LatLng) -> Unit = {},
     mapType: Int = 1, // BaiduMap.MAP_TYPE_SATELLITE
     isTrafficEnabled: Boolean = false,
-    isMyLocationEnabled: Boolean = false
+    isMyLocationEnabled: Boolean = false,
+    zoomLevel: Float = 15f
 ) {
     val context = LocalContext.current
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
+    var currentZoom by remember { mutableStateOf(zoomLevel) }
 
-    // 增强的占位界面，支持点击交互
+    // 增强的地图模拟界面，支持缩放和交互
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(
                 androidx.compose.ui.graphics.Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
+                        Color(0xFF2E3440),
+                        Color(0xFF3B4252),
+                        Color(0xFF434C5E)
                     )
                 )
             )
     ) {
-        // 网格背景
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val gridSize = 50.dp.toPx()
+        // 地图网格背景（支持缩放）
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer(
+                    scaleX = currentZoom / 15f,
+                    scaleY = currentZoom / 15f
+                )
+        ) {
+            val baseGridSize = 50.dp.toPx()
+            val gridSize = baseGridSize * (currentZoom / 15f)
             val strokeWidth = 1.dp.toPx()
 
-            // 绘制网格线
-            for (x in 0..((size.width / gridSize).toInt())) {
+            // 绘制地图网格线
+            for (x in 0..((size.width / gridSize).toInt() + 2)) {
                 drawLine(
-                    color = Color.White.copy(alpha = 0.1f),
+                    color = Color.White.copy(alpha = 0.15f),
                     start = Offset(x * gridSize, 0f),
                     end = Offset(x * gridSize, size.height),
                     strokeWidth = strokeWidth
                 )
             }
 
-            for (y in 0..((size.height / gridSize).toInt())) {
+            for (y in 0..((size.height / gridSize).toInt() + 2)) {
                 drawLine(
-                    color = Color.White.copy(alpha = 0.1f),
+                    color = Color.White.copy(alpha = 0.15f),
                     start = Offset(0f, y * gridSize),
                     end = Offset(size.width, y * gridSize),
                     strokeWidth = strokeWidth
@@ -97,25 +108,25 @@ fun BaiduMapView(
                     }
                 }
         ) {
-            // 中心提示
+            // 地图状态提示
             Column(
                 modifier = Modifier.align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
                     text = "🗺️",
-                    style = MaterialTheme.typography.displayLarge,
-                    color = Color.White.copy(alpha = 0.8f)
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.White.copy(alpha = 0.9f)
                 )
                 Text(
-                    text = "模拟地图视图",
+                    text = "地图加载中...",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = "点击任意位置选择坐标",
+                    text = "点击选择位置 • 缩放级别: ${String.format("%.1f", currentZoom)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Center

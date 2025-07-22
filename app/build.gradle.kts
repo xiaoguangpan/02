@@ -71,9 +71,10 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    // 百度地图SDK - 暂时注释，先确保基本构建成功
-    // implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.5.4")
-    // TODO: 需要手动下载百度地图SDK的AAR文件
+    // 百度地图SDK - 使用本地AAR文件或Maven仓库
+    implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.5.4")
+    implementation("com.baidu.lbsyun:BaiduMapSDK_Search:7.5.4")
+    implementation("com.baidu.lbsyun:BaiduMapSDK_Util:7.5.4")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
