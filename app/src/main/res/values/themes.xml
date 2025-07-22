@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 定红定位模拟器主题 -->
-    <style name="Theme.LocationMock" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.LocationMock" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/dinghong_primary</item>
-        <item name="colorSecondary">@color/dinghong_secondary</item>
-        <item name="colorError">@color/dinghong_error</item>
-        <item name="colorSurface">@color/dinghong_surface</item>
+        <item name="colorPrimaryDark">@color/dinghong_primary</item>
+        <item name="colorAccent">@color/dinghong_secondary</item>
         <item name="android:colorBackground">@color/dinghong_background</item>
+        <item name="android:windowBackground">@color/dinghong_background</item>
     </style>
 </resources>
