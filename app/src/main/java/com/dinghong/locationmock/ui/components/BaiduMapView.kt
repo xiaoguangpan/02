@@ -160,6 +160,9 @@ fun BaiduMapView(
 
     // 模拟地图准备完成回调
     LaunchedEffect(Unit) {
+        // 模拟地图初始化过程
+        kotlinx.coroutines.delay(500) // 模拟加载时间
         onMapReady(BaiduMap())
+        android.util.Log.i("BaiduMapView", "模拟地图组件初始化完成")
     }
 }

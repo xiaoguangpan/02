@@ -150,7 +150,16 @@ class MainViewModel : ViewModel() {
             }
         }
         
-        addDebugLog("定红定位模拟器已启动")
+        addDebugLog("定红定位模拟器已启动", "SUCCESS")
+        addDebugLog("正在初始化地图组件...", "INFO")
+
+        // 设置默认位置（北京天安门）
+        val defaultLocation = LatLng(39.904200, 116.407400)
+        _uiState.value = _uiState.value.copy(
+            selectedLocation = defaultLocation,
+            currentCoordinate = formatCoordinate(defaultLocation)
+        )
+        addDebugLog("设置默认位置: ${defaultLocation.latitude}, ${defaultLocation.longitude}", "INFO")
 
         // 应用启动时自动获取当前位置
         getCurrentLocationSilently()
@@ -161,7 +170,8 @@ class MainViewModel : ViewModel() {
      */
     fun onMapReady(baiduMap: BaiduMap) {
         mapInteractionManager.initializeMap(baiduMap)
-        addDebugLog("百度地图初始化完成")
+        addDebugLog("地图组件初始化完成", "SUCCESS")
+        addDebugLog("可以点击地图选择位置或输入坐标", "INFO")
     }
     
     /**
@@ -169,7 +179,16 @@ class MainViewModel : ViewModel() {
      */
     fun onMapClick(latLng: LatLng) {
         mapInteractionManager.onMapClick(latLng)
-        
+
+        // 更新UI状态
+        _uiState.value = _uiState.value.copy(
+            selectedLocation = latLng,
+            currentCoordinate = formatCoordinate(latLng)
+        )
+
+        addDebugLog("选择位置: ${String.format("%.6f", latLng.latitude)}, ${String.format("%.6f", latLng.longitude)}", "SUCCESS")
+        addDebugLog("现在可以点击'开始模拟'按钮", "INFO")
+
         // 显示坐标转换信息
         val conversions = mapInteractionManager.getCoordinateConversions(latLng)
         conversions.forEach { (system, coordinate) ->
