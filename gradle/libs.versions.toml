@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.5.2"
 kotlin = "1.9.25"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -13,7 +13,7 @@ navigationCompose = "2.8.4"
 lifecycleViewmodelCompose = "2.8.7"
 accompanistPermissions = "0.32.0"
 playServicesLocation = "21.3.0"
-baiduMapSdk = "7.6.0"
+baiduMapSdk = "7.5.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

@@ -9,8 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.baidu.mapapi.map.BaiduMap
-import com.baidu.mapapi.model.LatLng
+// import com.baidu.mapapi.map.BaiduMap
+// import com.baidu.mapapi.model.LatLng
+import com.dinghong.locationmock.ui.components.BaiduMap
+import com.dinghong.locationmock.ui.components.LatLng
 import com.dinghong.locationmock.ui.components.BaiduMapView
 import com.dinghong.locationmock.ui.components.BottomControlCard
 import com.dinghong.locationmock.ui.components.DebugPanel
@@ -45,7 +47,7 @@ fun MainScreen(
             onMapClick = { latLng ->
                 viewModel.onMapClick(latLng)
             },
-            mapType = BaiduMap.MAP_TYPE_SATELLITE,
+            mapType = 1, // BaiduMap.MAP_TYPE_SATELLITE
             isTrafficEnabled = false,
             isMyLocationEnabled = false
         )

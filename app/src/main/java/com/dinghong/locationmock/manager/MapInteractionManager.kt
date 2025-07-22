@@ -2,11 +2,20 @@ package com.dinghong.locationmock.manager
 
 import android.content.Context
 import android.util.Log
-import com.baidu.mapapi.map.*
-import com.baidu.mapapi.model.LatLng
-import com.baidu.mapapi.search.core.SearchResult
-import com.baidu.mapapi.search.geocode.*
-import com.baidu.mapapi.search.poi.*
+// 临时注释百度地图SDK导入
+// import com.baidu.mapapi.map.*
+// import com.baidu.mapapi.model.LatLng
+// import com.baidu.mapapi.search.core.SearchResult
+// import com.baidu.mapapi.search.geocode.*
+// import com.baidu.mapapi.search.poi.*
+
+// 临时数据类定义
+data class LatLng(val latitude: Double, val longitude: Double)
+data class BaiduMap(val dummy: String = "placeholder")
+data class Marker(val position: LatLng)
+data class SearchResult(val error: String = "")
+data class GeoCoder(val dummy: String = "placeholder")
+data class PoiSearch(val dummy: String = "placeholder")
 import com.dinghong.locationmock.utils.CoordinateConverter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,21 +56,17 @@ class MapInteractionManager(private val context: Context) {
     )
     
     /**
-     * 初始化地图
+     * 初始化地图（临时简化版本）
+     * TODO: 添加百度地图SDK后完善
      */
     fun initializeMap(map: BaiduMap) {
         this.baiduMap = map
-        
-        // 初始化搜索服务
-        geocodeSearch = GeoCoder.newInstance().apply {
-            setOnGetGeoCodeResultListener(geocodeListener)
-        }
-        
-        poiSearch = PoiSearch.newInstance().apply {
-            setOnGetPoiResultListener(poiListener)
-        }
-        
-        Log.i(TAG, "地图交互管理器已初始化")
+
+        // 临时注释搜索服务初始化
+        // geocodeSearch = GeoCoder.newInstance()
+        // poiSearch = PoiSearch.newInstance()
+
+        Log.i(TAG, "地图交互管理器已初始化（简化版本）")
     }
     
     /**
@@ -78,36 +83,46 @@ class MapInteractionManager(private val context: Context) {
     }
     
     /**
-     * 执行地址搜索
+     * 执行地址搜索（临时简化版本）
      */
     fun searchAddress(query: String) {
         if (query.isBlank()) {
             _searchResults.value = emptyList()
             return
         }
-        
+
         _isSearching.value = true
-        
+
         // 检查是否为坐标格式
         if (isCoordinateFormat(query)) {
             handleCoordinateInput(query)
         } else {
-            // 执行POI搜索
-            performPoiSearch(query)
+            // 临时模拟搜索结果
+            _searchResults.value = listOf(
+                SearchResultItem(
+                    name = "搜索结果: $query",
+                    address = "模拟地址（需要百度地图SDK）",
+                    location = LatLng(39.915, 116.404),
+                    type = "模拟"
+                )
+            )
+            _isSearching.value = false
         }
     }
     
     /**
-     * 移动到指定位置
+     * 移动到指定位置（临时简化版本）
      */
     fun moveToLocation(latLng: LatLng, zoom: Float = 16f) {
-        baiduMap?.let { map ->
-            val mapStatus = MapStatusUpdateFactory.newLatLngZoom(latLng, zoom)
-            map.animateMapStatus(mapStatus)
-            
-            _selectedLocation.value = latLng
-            addLocationMarker(latLng)
-        }
+        // 临时注释地图操作
+        // baiduMap?.let { map ->
+        //     val mapStatus = MapStatusUpdateFactory.newLatLngZoom(latLng, zoom)
+        //     map.animateMapStatus(mapStatus)
+        // }
+
+        _selectedLocation.value = latLng
+        // addLocationMarker(latLng) // 临时注释
+        Log.i(TAG, "移动到位置: ${formatCoordinate(latLng)}")
     }
     
     /**
@@ -123,97 +138,40 @@ class MapInteractionManager(private val context: Context) {
     }
     
     /**
-     * 缩放地图
+     * 缩放地图（临时简化版本）
      */
     fun zoomIn() {
-        baiduMap?.let { map ->
-            val currentZoom = map.mapStatus.zoom
-            val newZoom = (currentZoom + 1f).coerceAtMost(21f)
-            val mapStatus = MapStatusUpdateFactory.zoomTo(newZoom)
-            map.animateMapStatus(mapStatus)
-        }
+        // 临时注释地图缩放操作
+        Log.i(TAG, "地图放大")
     }
-    
+
     fun zoomOut() {
-        baiduMap?.let { map ->
-            val currentZoom = map.mapStatus.zoom
-            val newZoom = (currentZoom - 1f).coerceAtLeast(3f)
-            val mapStatus = MapStatusUpdateFactory.zoomTo(newZoom)
-            map.animateMapStatus(mapStatus)
-        }
+        // 临时注释地图缩放操作
+        Log.i(TAG, "地图缩小")
     }
-    
+
     /**
-     * 重置指南针
+     * 重置指南针（临时简化版本）
      */
     fun resetCompass() {
-        baiduMap?.let { map ->
-            val mapStatus = MapStatusUpdateFactory.newMapStatus(
-                MapStatus.Builder(map.mapStatus)
-                    .rotate(0f)
-                    .overlook(0f)
-                    .build()
-            )
-            map.animateMapStatus(mapStatus)
-        }
+        // 临时注释指南针重置操作
+        Log.i(TAG, "指南针重置")
     }
     
     /**
-     * 添加位置标记
+     * 添加位置标记（临时简化版本）
      */
     private fun addLocationMarker(latLng: LatLng) {
-        baiduMap?.let { map ->
-            // 清除之前的标记
-            currentMarker?.remove()
-            
-            // 创建标记选项
-            val markerOptions = MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                .draggable(true)
-            
-            // 添加新标记
-            currentMarker = map.addOverlay(markerOptions) as Marker
-            
-            // 设置标记拖拽监听
-            map.setOnMarkerDragListener(object : BaiduMap.OnMarkerDragListener {
-                override fun onMarkerDrag(marker: Marker) {
-                    // 拖拽中
-                }
-                
-                override fun onMarkerDragEnd(marker: Marker) {
-                    val newPosition = marker.position
-                    _selectedLocation.value = newPosition
-                    performReverseGeocode(newPosition)
-                    Log.i(TAG, "标记拖拽结束: ${formatCoordinate(newPosition)}")
-                }
-                
-                override fun onMarkerDragStart(marker: Marker) {
-                    // 开始拖拽
-                }
-            })
-        }
+        // 临时注释标记操作
+        Log.i(TAG, "添加位置标记: ${formatCoordinate(latLng)}")
     }
-    
+
     /**
-     * 执行反地理编码
+     * 执行反地理编码（临时简化版本）
      */
     private fun performReverseGeocode(latLng: LatLng) {
-        geocodeSearch?.reverseGeoCode(ReverseGeoCodeOption().location(latLng))
-    }
-    
-    /**
-     * 执行POI搜索
-     */
-    private fun performPoiSearch(query: String) {
-        val searchOption = PoiNearbySearchOption()
-            .keyword(query)
-            .location(baiduMap?.mapStatus?.target ?: LatLng(39.915, 116.404))
-            .radius(5000) // 5公里搜索半径
-            .pageNum(0)
-            .pageCapacity(20)
-        
-        poiSearch?.searchNearby(searchOption)
+        // 临时注释反地理编码
+        Log.i(TAG, "执行反地理编码: ${formatCoordinate(latLng)}")
     }
     
     /**
@@ -244,69 +202,9 @@ class MapInteractionManager(private val context: Context) {
         }
     }
     
-    /**
-     * 地理编码监听器
-     */
-    private val geocodeListener = object : OnGetGeoCoderResultListener {
-        override fun onGetGeoCodeResult(result: GeoCodeResult?) {
-            // 正地理编码结果
-        }
-        
-        override fun onGetReverseGeoCodeResult(result: ReverseGeoCodeResult?) {
-            result?.let { reverseResult ->
-                if (reverseResult.error == SearchResult.ERRORNO.NO_ERROR) {
-                    val address = reverseResult.address
-                    Log.i(TAG, "反地理编码成功: $address")
-                    
-                    // 更新搜索结果
-                    _searchResults.value = listOf(
-                        SearchResultItem(
-                            name = "当前位置",
-                            address = address,
-                            location = reverseResult.location,
-                            type = "地址"
-                        )
-                    )
-                }
-            }
-            _isSearching.value = false
-        }
-    }
-    
-    /**
-     * POI搜索监听器
-     */
-    private val poiListener = object : OnGetPoiResultListener {
-        override fun onGetPoiResult(result: PoiResult?) {
-            result?.let { poiResult ->
-                if (poiResult.error == SearchResult.ERRORNO.NO_ERROR) {
-                    val results = poiResult.allPoi.map { poi ->
-                        SearchResultItem(
-                            name = poi.name,
-                            address = poi.address,
-                            location = poi.location,
-                            type = "POI"
-                        )
-                    }
-                    _searchResults.value = results
-                    Log.i(TAG, "POI搜索成功，找到${results.size}个结果")
-                }
-            }
-            _isSearching.value = false
-        }
-        
-        override fun onGetPoiDetailResult(result: PoiDetailResult?) {
-            // POI详情结果
-        }
-        
-        override fun onGetPoiDetailResult(result: PoiDetailSearchResult?) {
-            // POI详情搜索结果
-        }
-        
-        override fun onGetPoiIndoorResult(result: PoiIndoorResult?) {
-            // 室内POI结果
-        }
-    }
+    // 临时注释监听器，等添加百度地图SDK后启用
+    // private val geocodeListener = ...
+    // private val poiListener = ...
     
     /**
      * 检查是否为坐标格式
@@ -359,13 +257,14 @@ class MapInteractionManager(private val context: Context) {
     }
     
     /**
-     * 清理资源
+     * 清理资源（临时简化版本）
      */
     fun cleanup() {
-        geocodeSearch?.destroy()
-        poiSearch?.destroy()
-        currentMarker?.remove()
-        
+        // 临时注释资源清理
+        // geocodeSearch?.destroy()
+        // poiSearch?.destroy()
+        // currentMarker?.remove()
+
         Log.i(TAG, "地图交互管理器已清理")
     }
 }

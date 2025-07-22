@@ -17,7 +17,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         // 百度地图SDK仓库
-        maven { url = uri("https://jcenter.bintray.com") }
+        maven { url = uri("https://repo1.maven.org/maven2/") }
+        maven { url = uri("https://jitpack.io") }
     }
 }
 

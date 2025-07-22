@@ -63,7 +63,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
-    implementation(libs.baidu.map.sdk)
+    // 百度地图SDK - 暂时注释，先确保基本构建成功
+    // implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.5.4")
+    // TODO: 需要手动下载百度地图SDK的AAR文件
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

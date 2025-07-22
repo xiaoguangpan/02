@@ -1,92 +1,71 @@
 package com.dinghong.locationmock.ui.components
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import com.baidu.mapapi.map.*
-import com.baidu.mapapi.model.LatLng
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+// import com.baidu.mapapi.map.*
+// import com.baidu.mapapi.model.LatLng
+
+// 临时数据类，替代百度地图的LatLng
+data class LatLng(val latitude: Double, val longitude: Double)
+data class BaiduMap(val dummy: String = "placeholder")
 
 /**
- * 百度地图Compose组件
- * 封装百度地图MapView，提供Compose风格的API
+ * 百度地图Compose组件（临时占位版本）
+ * TODO: 添加百度地图SDK依赖后替换为真实实现
  */
 @Composable
 fun BaiduMapView(
     modifier: Modifier = Modifier,
     onMapReady: (BaiduMap) -> Unit = {},
     onMapClick: (LatLng) -> Unit = {},
-    mapType: Int = BaiduMap.MAP_TYPE_SATELLITE,
+    mapType: Int = 1, // BaiduMap.MAP_TYPE_SATELLITE
     isTrafficEnabled: Boolean = false,
     isMyLocationEnabled: Boolean = false
 ) {
     val context = LocalContext.current
-    var baiduMap by remember { mutableStateOf<BaiduMap?>(null) }
-    
-    AndroidView(
-        modifier = modifier.fillMaxSize(),
-        factory = { ctx ->
-            MapView(ctx).apply {
-                // 获取地图控制器
-                val map = this.map
-                baiduMap = map
-                
-                // 配置地图属性
-                map.apply {
-                    // 设置地图类型为卫星图
-                    mapType = mapType
-                    
-                    // 设置交通图层
-                    isTrafficEnabled = isTrafficEnabled
-                    
-                    // 设置我的位置图层
-                    isMyLocationEnabled = isMyLocationEnabled
-                    
-                    // 隐藏百度Logo和比例尺
-                    uiSettings.apply {
-                        isCompassEnabled = false
-                        isRotateGesturesEnabled = true
-                        isScrollGesturesEnabled = true
-                        isZoomGesturesEnabled = true
-                        isOverlookingGesturesEnabled = false
-                    }
-                    
-                    // 设置地图点击监听
-                    setOnMapClickListener(object : BaiduMap.OnMapClickListener {
-                        override fun onMapClick(latLng: LatLng) {
-                            onMapClick(latLng)
-                        }
-                        
-                        override fun onMapPoiClick(mapPoi: MapPoi): Boolean {
-                            onMapClick(mapPoi.position)
-                            return true
-                        }
-                    })
-                    
-                    // 设置默认地图中心点（北京）
-                    val defaultCenter = LatLng(39.915, 116.404)
-                    animateMapStatus(MapStatusUpdateFactory.newLatLngZoom(defaultCenter, 12f))
-                }
-                
-                // 回调地图准备完成
-                onMapReady(map)
-            }
-        },
-        update = { mapView ->
-            // 更新地图配置
-            baiduMap?.let { map ->
-                map.mapType = mapType
-                map.isTrafficEnabled = isTrafficEnabled
-                map.isMyLocationEnabled = isMyLocationEnabled
-            }
+
+    // 临时占位界面，显示地图加载提示
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "🗺️",
+                style = MaterialTheme.typography.displayLarge,
+                color = Color.White
+            )
+            Text(
+                text = "地图加载中...",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "需要添加百度地图SDK依赖",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
         }
-    )
-    
-    // 组件销毁时清理资源
-    DisposableEffect(Unit) {
-        onDispose {
-            // MapView的生命周期管理由AndroidView自动处理
-        }
+    }
+
+    // 模拟地图准备完成回调
+    LaunchedEffect(Unit) {
+        onMapReady(BaiduMap())
     }
 }

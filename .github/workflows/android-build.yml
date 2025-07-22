@@ -32,17 +32,23 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
           
-    - name: 授予 Gradle 执行权限
-      run: chmod +x gradlew
+    - name: 设置 Gradle Wrapper
+      run: |
+        # 下载 gradle-wrapper.jar
+        mkdir -p gradle/wrapper
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.14.3/gradle/wrapper/gradle-wrapper.jar
 
-    - name: 下载 Gradle Wrapper
-      run: ./gradlew wrapper --gradle-version=8.14.3
+        # 授予执行权限
+        chmod +x gradlew
+
+    - name: 验证 Gradle 设置
+      run: ./gradlew --version
 
     - name: 构建 Debug APK
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug --stacktrace
 
     - name: 构建 Release APK
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleRelease --stacktrace
       
     - name: 生成签名信息和SHA1
       run: |
