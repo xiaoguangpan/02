@@ -65,44 +65,20 @@ jobs:
 
     - name: 输出构建信息 (编译前)
       run: |
-        echo "=== reding定位模拟器构建信息 ==="
-        echo "构建时间: $(date '+%Y-%m-%d %H:%M:%S')"
-        echo "Git提交: $(git rev-parse --short HEAD)"
-        echo "分支: $(git branch --show-current)"
-        echo ""
-        echo "=== 应用信息 ==="
-        echo "应用名称: reding定位模拟器"
-        echo "包名(PackageName): com.dinghong.locationmock"
-        echo "版本: 2.0"
-        echo ""
-        echo "=== Debug版本SHA1 (用于开发测试) ==="
-
         # 确保debug.keystore存在
         if [ ! -f ~/.android/debug.keystore ]; then
-          echo "创建debug.keystore..."
           mkdir -p ~/.android
-          keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" >/dev/null 2>&1
         fi
 
-        # 获取完整SHA1并直接显示
-        echo "Debug keystore路径: ~/.android/debug.keystore"
-        echo ""
-        echo "🔑 完整SHA1签名 (用于百度地图API申请):"
+        # 获取SHA1值
         SHA1_VALUE=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
+        MD5_VALUE=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "MD5:" | head -1 | sed 's/.*MD5: //' | tr -d ' ')
+
+        # 只输出包名和SHA1
+        echo "包名: com.dinghong.locationmock"
         echo "SHA1: $SHA1_VALUE"
-        echo ""
-        echo "📋 复制上面的SHA1值用于百度地图API申请"
-        echo ""
-        echo "=== 百度地图SDK配置说明 ==="
-        echo "1. 访问百度地图开放平台: https://lbsyun.baidu.com/apiconsole/key"
-        echo "2. 点击【创建应用】"
-        echo "3. 填写以下信息:"
-        echo "   - 应用名称: reding定位模拟器"
-        echo "   - 应用类型: 选择【Android SDK】"
-        echo "   - 包名: com.dinghong.locationmock"
-        echo "   - SHA1: $SHA1_VALUE"
-        echo "4. 获取API Key后，替换AndroidManifest.xml中的YOUR_BAIDU_MAP_API_KEY"
-        echo ""
+        echo "MD5: $MD5_VALUE"
 
     - name: 构建 Debug APK
       run: |
@@ -112,42 +88,7 @@ jobs:
     - name: 构建 Release APK
       run: ./gradlew assembleRelease --stacktrace
       
-    - name: 生成签名信息和SHA1
-      run: |
-        echo "=== reding定位模拟器构建信息 ===" > build-info.txt
-        echo "构建时间: $(date '+%Y-%m-%d %H:%M:%S')" >> build-info.txt
-        echo "Git提交: ${{ github.sha }}" >> build-info.txt
-        echo "分支: ${{ github.ref_name }}" >> build-info.txt
-        echo "" >> build-info.txt
-        echo "=== 应用信息 ===" >> build-info.txt
-        echo "应用名称: reding定位模拟器" >> build-info.txt
-        echo "包名(PackageName): com.dinghong.locationmock" >> build-info.txt
-        echo "版本: 2.0" >> build-info.txt
-        echo "" >> build-info.txt
 
-        # 获取Debug版本SHA1（用于文件记录）
-        echo "=== Debug版本SHA1 (用于开发和测试) ===" >> build-info.txt
-        DEBUG_SHA1=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
-        echo "Debug SHA1: $DEBUG_SHA1" >> build-info.txt
-        echo "" >> build-info.txt
-        echo "=== 百度地图SDK配置说明 ===" >> build-info.txt
-        echo "1. 访问百度地图开放平台: https://lbsyun.baidu.com/apiconsole/key" >> build-info.txt
-        echo "2. 点击【创建应用】" >> build-info.txt
-        echo "3. 填写以下信息:" >> build-info.txt
-        echo "   - 应用名称: reding定位模拟器" >> build-info.txt
-        echo "   - 应用类型: 选择【Android SDK】" >> build-info.txt
-        echo "   - 包名: com.dinghong.locationmock" >> build-info.txt
-        echo "   - SHA1: $DEBUG_SHA1" >> build-info.txt
-        echo "4. 获取API Key后，替换AndroidManifest.xml中的YOUR_BAIDU_MAP_API_KEY" >> build-info.txt
-        echo "" >> build-info.txt
-        echo "=== 构建产物信息 ===" >> build-info.txt
-        if [ -d "app/build/outputs/apk/debug/" ]; then
-          ls -la app/build/outputs/apk/debug/ >> build-info.txt
-        fi
-        if [ -d "app/build/outputs/apk/release/" ]; then
-          ls -la app/build/outputs/apk/release/ >> build-info.txt
-        fi
-        
     - name: 重命名APK文件
       run: |
         mkdir -p release-files
@@ -235,12 +176,7 @@ jobs:
         name: reding-release-apk
         path: release-files/reding-release.apk
         
-    - name: 上传构建信息
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-info
-        path: release-files/build-info.txt
-        
+
     - name: 输出构建结果
       run: |
         echo "🎉 reding定位模拟器构建完成!"
@@ -253,14 +189,6 @@ jobs:
         echo "📦 构建产物:"
         echo "  - Debug APK: reding-debug.apk (已签名，可直接安装)"
         echo "  - Release APK: reding-release.apk (已签名，可直接安装)"
-        echo "  - 构建信息: build-info.txt"
-        echo ""
-        echo "🔑 百度地图SDK配置:"
-        echo "  1. 访问: https://lbsyun.baidu.com/apiconsole/key"
-        echo "  2. 创建应用，选择【Android SDK】"
-        echo "  3. 输入包名: com.dinghong.locationmock"
-        echo "  4. 输入SHA1: 请查看build-info.txt文件中的Debug SHA1"
-        echo "  5. 将获得的API Key替换AndroidManifest.xml中的YOUR_BAIDU_MAP_API_KEY"
         echo ""
         echo "✅ 所有文件已上传到GitHub Actions Artifacts"
         
