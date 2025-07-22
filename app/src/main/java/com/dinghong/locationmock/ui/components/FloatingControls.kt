@@ -56,7 +56,7 @@ fun FloatingControls(
         )
         
         // 分隔线
-        HorizontalDivider(
+        Divider(
             modifier = Modifier
                 .width(32.dp)
                 .padding(vertical = 4.dp),

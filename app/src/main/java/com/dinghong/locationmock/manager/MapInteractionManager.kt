@@ -2,6 +2,11 @@ package com.dinghong.locationmock.manager
 
 import android.content.Context
 import android.util.Log
+import com.dinghong.locationmock.utils.CoordinateConverter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
 // 临时注释百度地图SDK导入
 // import com.baidu.mapapi.map.*
 // import com.baidu.mapapi.model.LatLng
@@ -16,10 +21,6 @@ data class Marker(val position: LatLng)
 data class SearchResult(val error: String = "")
 data class GeoCoder(val dummy: String = "placeholder")
 data class PoiSearch(val dummy: String = "placeholder")
-import com.dinghong.locationmock.utils.CoordinateConverter
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * 地图交互管理器

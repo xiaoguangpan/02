@@ -1,7 +1,11 @@
 package com.dinghong.locationmock.utils
 
-import com.baidu.mapapi.model.LatLng
-import com.baidu.mapapi.utils.CoordinateConverter
+// 临时注释百度地图SDK导入
+// import com.baidu.mapapi.model.LatLng
+// import com.baidu.mapapi.utils.CoordinateConverter
+
+// 临时数据类定义
+data class LatLng(val latitude: Double, val longitude: Double)
 import kotlin.math.*
 
 /**
@@ -101,18 +105,17 @@ object CoordinateConverter {
     }
     
     /**
-     * 使用百度SDK进行坐标转换
+     * 使用百度SDK进行坐标转换（临时简化版本）
+     * TODO: 添加百度地图SDK后启用
      */
     fun convertWithBaiduSDK(
         latitude: Double,
         longitude: Double,
-        from: CoordinateConverter.CoordType,
-        to: CoordinateConverter.CoordType = CoordinateConverter.CoordType.BD09LL
+        from: String = "WGS84",
+        to: String = "BD09LL"
     ): LatLng {
-        val converter = CoordinateConverter()
-            .from(from)
-            .coord(LatLng(latitude, longitude))
-        return converter.convert()
+        // 临时返回原坐标，等SDK集成后实现真实转换
+        return LatLng(latitude, longitude)
     }
     
     /**

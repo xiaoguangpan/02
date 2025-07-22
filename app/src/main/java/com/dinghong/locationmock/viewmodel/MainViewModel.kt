@@ -6,8 +6,13 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.baidu.mapapi.map.BaiduMap
-import com.baidu.mapapi.model.LatLng
+// 临时注释百度地图SDK导入
+// import com.baidu.mapapi.map.BaiduMap
+// import com.baidu.mapapi.model.LatLng
+
+// 使用本地定义的数据类
+import com.dinghong.locationmock.manager.LatLng
+import com.dinghong.locationmock.manager.BaiduMap
 import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.utils.PermissionHelper
