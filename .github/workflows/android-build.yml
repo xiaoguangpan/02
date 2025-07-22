@@ -190,20 +190,42 @@ jobs:
         echo "=== 验证APK签名信息 ==="
 
         if [ -f "release-files/reding-debug.apk" ]; then
-          echo "🔍 Debug APK签名信息:"
-          aapt dump badging release-files/reding-debug.apk | grep -E "(package|application-label)"
-          # 使用apksigner验证签名（如果可用）
-          if command -v apksigner &> /dev/null; then
-            apksigner verify --verbose release-files/reding-debug.apk && echo "✅ Debug APK签名有效" || echo "❌ Debug APK签名无效"
+          echo "🔍 Debug APK基本信息:"
+          file release-files/reding-debug.apk
+          ls -la release-files/reding-debug.apk
+
+          # 使用unzip检查APK内容
+          echo "📦 APK内容检查:"
+          unzip -l release-files/reding-debug.apk | grep -E "(META-INF|AndroidManifest)" | head -10
+
+          # 检查签名文件
+          echo "🔐 签名文件检查:"
+          unzip -l release-files/reding-debug.apk | grep "META-INF.*\.(RSA\|DSA\|SF\|MF)" || echo "未找到签名文件"
+
+          # 使用jarsigner验证签名（Java工具，应该可用）
+          if command -v jarsigner &> /dev/null; then
+            echo "🔍 使用jarsigner验证签名:"
+            jarsigner -verify -verbose release-files/reding-debug.apk && echo "✅ Debug APK签名有效" || echo "❌ Debug APK签名无效"
           fi
         fi
 
         if [ -f "release-files/reding-release.apk" ]; then
-          echo "🔍 Release APK签名信息:"
-          aapt dump badging release-files/reding-release.apk | grep -E "(package|application-label)"
-          # 使用apksigner验证签名（如果可用）
-          if command -v apksigner &> /dev/null; then
-            apksigner verify --verbose release-files/reding-release.apk && echo "✅ Release APK签名有效" || echo "❌ Release APK签名无效"
+          echo "🔍 Release APK基本信息:"
+          file release-files/reding-release.apk
+          ls -la release-files/reding-release.apk
+
+          # 使用unzip检查APK内容
+          echo "📦 APK内容检查:"
+          unzip -l release-files/reding-release.apk | grep -E "(META-INF|AndroidManifest)" | head -10
+
+          # 检查签名文件
+          echo "🔐 签名文件检查:"
+          unzip -l release-files/reding-release.apk | grep "META-INF.*\.(RSA\|DSA\|SF\|MF)" || echo "未找到签名文件"
+
+          # 使用jarsigner验证签名
+          if command -v jarsigner &> /dev/null; then
+            echo "🔍 使用jarsigner验证签名:"
+            jarsigner -verify -verbose release-files/reding-release.apk && echo "✅ Release APK签名有效" || echo "❌ Release APK签名无效"
           fi
         fi
 
