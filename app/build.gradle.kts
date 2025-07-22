@@ -20,18 +20,9 @@ android {
         }
     }
 
-    signingConfigs {
-        create("debug") {
-            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
-
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("debug")
+            // debug buildType已经默认使用debug signingConfig
         }
         release {
             isMinifyEnabled = false
