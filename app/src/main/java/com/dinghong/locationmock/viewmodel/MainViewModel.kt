@@ -171,7 +171,7 @@ class MainViewModel : ViewModel() {
     /**
      * 地图准备完成
      */
-    fun onMapReady(baiduMap: com.baidu.mapapi.map.BaiduMap?) {
+    fun onMapReady(baiduMap: Any?) {
         try {
             if (baiduMap != null) {
                 addDebugLog("正在配置地图交互管理器...", "INFO")
