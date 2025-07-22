@@ -114,7 +114,7 @@ jobs:
           find app/build/outputs/apk/release/ -name "*.apk" || echo "Release目录为空"
         fi
 
-        cp build-info.txt release-files/
+
 
         # 显示最终文件
         echo "📦 最终生成的文件:"
@@ -210,7 +210,6 @@ jobs:
         files: |
           artifacts/reding-debug-apk/reding-debug.apk
           artifacts/reding-release-apk/reding-release.apk
-          artifacts/build-info/build-info.txt
         body: |
           ## reding定位模拟器 v2.0
           
@@ -230,13 +229,12 @@ jobs:
           
           ### 🔑 百度地图API Key配置
           - 包名: `com.dinghong.locationmock`
-          - SHA1: 请查看build-info.txt文件
+          - SHA1: 请查看GitHub Actions构建日志获取
           - 申请地址: https://lbsyun.baidu.com/apiconsole/key
-          
+
           ### 📦 下载文件
           - `reding-debug.apk`: 调试版本（已签名，可直接安装）
           - `reding-release.apk`: 发布版本（已签名，可直接安装）
-          - `build-info.txt`: 构建信息和配置说明
 
           ### 🔧 安装说明
           两个APK文件都已使用debug keystore签名，可以直接通过以下方式安装：
