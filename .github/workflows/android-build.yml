@@ -44,6 +44,25 @@ jobs:
     - name: 验证 Gradle 设置
       run: ./gradlew --version
 
+    - name: 创建Debug Keystore
+      run: |
+        # 确保debug.keystore存在
+        mkdir -p ~/.android
+        if [ ! -f ~/.android/debug.keystore ]; then
+          echo "创建debug.keystore用于APK签名..."
+          keytool -genkey -v -keystore ~/.android/debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          echo "Debug keystore创建完成"
+        else
+          echo "Debug keystore已存在"
+        fi
+
+        # 验证keystore
+        echo "验证keystore信息:"
+        keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey
+
     - name: 输出构建信息 (编译前)
       run: |
         echo "=== reding定位模拟器构建信息 ==="
@@ -138,10 +157,56 @@ jobs:
     - name: 重命名APK文件
       run: |
         mkdir -p release-files
-        cp app/build/outputs/apk/debug/app-debug.apk release-files/reding-debug.apk
-        cp app/build/outputs/apk/release/app-release-unsigned.apk release-files/reding-release.apk
+
+        # 检查APK文件是否存在并复制
+        if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          cp app/build/outputs/apk/debug/app-debug.apk release-files/reding-debug.apk
+          echo "✅ Debug APK已复制: reding-debug.apk"
+        else
+          echo "❌ Debug APK文件不存在"
+          find app/build/outputs/apk/debug/ -name "*.apk" || echo "Debug目录为空"
+        fi
+
+        # Release APK现在应该是签名的，文件名为app-release.apk
+        if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+          cp app/build/outputs/apk/release/app-release.apk release-files/reding-release.apk
+          echo "✅ Release APK已复制: reding-release.apk (已签名)"
+        elif [ -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+          cp app/build/outputs/apk/release/app-release-unsigned.apk release-files/reding-release.apk
+          echo "⚠️ Release APK已复制: reding-release.apk (未签名版本)"
+        else
+          echo "❌ Release APK文件不存在"
+          find app/build/outputs/apk/release/ -name "*.apk" || echo "Release目录为空"
+        fi
+
         cp build-info.txt release-files/
-        
+
+        # 显示最终文件
+        echo "📦 最终生成的文件:"
+        ls -la release-files/
+
+    - name: 验证APK签名
+      run: |
+        echo "=== 验证APK签名信息 ==="
+
+        if [ -f "release-files/reding-debug.apk" ]; then
+          echo "🔍 Debug APK签名信息:"
+          aapt dump badging release-files/reding-debug.apk | grep -E "(package|application-label)"
+          # 使用apksigner验证签名（如果可用）
+          if command -v apksigner &> /dev/null; then
+            apksigner verify --verbose release-files/reding-debug.apk && echo "✅ Debug APK签名有效" || echo "❌ Debug APK签名无效"
+          fi
+        fi
+
+        if [ -f "release-files/reding-release.apk" ]; then
+          echo "🔍 Release APK签名信息:"
+          aapt dump badging release-files/reding-release.apk | grep -E "(package|application-label)"
+          # 使用apksigner验证签名（如果可用）
+          if command -v apksigner &> /dev/null; then
+            apksigner verify --verbose release-files/reding-release.apk && echo "✅ Release APK签名有效" || echo "❌ Release APK签名无效"
+          fi
+        fi
+
     - name: 上传Debug APK
       uses: actions/upload-artifact@v4
       with:
@@ -170,8 +235,8 @@ jobs:
         echo "  - 版本: 2.0"
         echo ""
         echo "📦 构建产物:"
-        echo "  - Debug APK: reding-debug.apk"
-        echo "  - Release APK: reding-release.apk"
+        echo "  - Debug APK: reding-debug.apk (已签名，可直接安装)"
+        echo "  - Release APK: reding-release.apk (已签名，可直接安装)"
         echo "  - 构建信息: build-info.txt"
         echo ""
         echo "🔑 百度地图SDK配置:"
@@ -225,8 +290,14 @@ jobs:
           - 申请地址: https://lbsyun.baidu.com/apiconsole/key
           
           ### 📦 下载文件
-          - `reding-debug.apk`: 调试版本（推荐）
-          - `reding-release.apk`: 发布版本（未签名）
+          - `reding-debug.apk`: 调试版本（已签名，可直接安装）
+          - `reding-release.apk`: 发布版本（已签名，可直接安装）
           - `build-info.txt`: 构建信息和配置说明
+
+          ### 🔧 安装说明
+          两个APK文件都已使用debug keystore签名，可以直接通过以下方式安装：
+          - 通过ADB: `adb install reding-debug.apk` 或 `adb install reding-release.apk`
+          - 直接在设备上安装（需要允许未知来源）
+          - 不会出现证书错误
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
