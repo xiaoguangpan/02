@@ -84,11 +84,14 @@ jobs:
           keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
         fi
 
-        # 获取完整SHA1
+        # 获取完整SHA1并直接显示
         echo "Debug keystore路径: ~/.android/debug.keystore"
-        echo -n "Debug SHA1: "
-        keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' '
         echo ""
+        echo "🔑 完整SHA1签名 (用于百度地图API申请):"
+        SHA1_VALUE=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
+        echo "SHA1: $SHA1_VALUE"
+        echo ""
+        echo "📋 复制上面的SHA1值用于百度地图API申请"
         echo ""
         echo "=== 百度地图SDK配置说明 ==="
         echo "1. 访问百度地图开放平台: https://lbsyun.baidu.com/apiconsole/key"
@@ -97,7 +100,7 @@ jobs:
         echo "   - 应用名称: reding定位模拟器"
         echo "   - 应用类型: 选择【Android SDK】"
         echo "   - 包名: com.dinghong.locationmock"
-        echo "   - SHA1: (使用上面显示的完整SHA1值)"
+        echo "   - SHA1: $SHA1_VALUE"
         echo "4. 获取API Key后，替换AndroidManifest.xml中的YOUR_BAIDU_MAP_API_KEY"
         echo ""
 
@@ -122,19 +125,10 @@ jobs:
         echo "版本: 2.0" >> build-info.txt
         echo "" >> build-info.txt
 
-        # 获取Debug版本SHA1
+        # 获取Debug版本SHA1（用于文件记录）
         echo "=== Debug版本SHA1 (用于开发和测试) ===" >> build-info.txt
-        if [ -f ~/.android/debug.keystore ]; then
-          DEBUG_SHA1=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -i "sha1" | head -1 | cut -d: -f2 | tr -d ' ')
-          echo "Debug SHA1: $DEBUG_SHA1" >> build-info.txt
-        else
-          echo "Debug keystore不存在，创建默认keystore..." >> build-info.txt
-          mkdir -p ~/.android
-          keytool -genkey -v -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
-          DEBUG_SHA1=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -i "sha1" | head -1 | cut -d: -f2 | tr -d ' ')
-          echo "Debug SHA1: $DEBUG_SHA1" >> build-info.txt
-        fi
-
+        DEBUG_SHA1=$(keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep "SHA1:" | head -1 | sed 's/.*SHA1: //' | tr -d ' ')
+        echo "Debug SHA1: $DEBUG_SHA1" >> build-info.txt
         echo "" >> build-info.txt
         echo "=== 百度地图SDK配置说明 ===" >> build-info.txt
         echo "1. 访问百度地图开放平台: https://lbsyun.baidu.com/apiconsole/key" >> build-info.txt
