@@ -156,23 +156,31 @@ private fun FavoriteLocationItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = favorite.address,
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "${String.format("%.6f", favorite.latLng.latitude)}, ${String.format("%.6f", favorite.latLng.longitude)}",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(favorite.createdAt)),
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                if (favorite.address.isNotBlank()) {
+                    Text(
+                        text = favorite.address,
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "${String.format("%.4f", favorite.latLng.latitude)}, ${String.format("%.4f", favorite.latLng.longitude)}",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(favorite.createdAt)),
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
             
             IconButton(

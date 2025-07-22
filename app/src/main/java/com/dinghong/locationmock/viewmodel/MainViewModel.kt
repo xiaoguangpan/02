@@ -182,6 +182,13 @@ class MainViewModel : ViewModel() {
      */
     fun updateSearchText(text: String) {
         _uiState.value = _uiState.value.copy(searchText = text)
+        // 实时搜索建议
+        if (text.isNotBlank() && text.length >= 2) {
+            mapInteractionManager.searchAddress(text)
+        } else {
+            // 清空搜索建议
+            _uiState.value = _uiState.value.copy(searchSuggestions = emptyList())
+        }
     }
     
     /**
