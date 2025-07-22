@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -104,14 +105,20 @@ private fun DebugPanelHeader(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Badge(
-                containerColor = DebugLogInfo
+            Surface(
+                shape = CircleShape,
+                color = DebugLogInfo,
+                modifier = Modifier.size(20.dp)
             ) {
-                Text(
-                    text = logCount.toString(),
-                    color = Color.White,
-                    fontSize = 10.sp
-                )
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = logCount.toString(),
+                        color = Color.White,
+                        fontSize = 10.sp
+                    )
+                }
             }
         }
         
