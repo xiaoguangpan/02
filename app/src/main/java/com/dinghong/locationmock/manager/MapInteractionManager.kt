@@ -58,15 +58,7 @@ class MapInteractionManager(private val context: Context) {
     private val _isSearching = MutableStateFlow(false)
     val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
     
-    /**
-     * 搜索结果项
-     */
-    data class SearchResultItem(
-        val name: String,
-        val address: String,
-        val location: LatLng,
-        val type: String = "POI"
-    )
+
     
     /**
      * 初始化地图（模拟版本）
