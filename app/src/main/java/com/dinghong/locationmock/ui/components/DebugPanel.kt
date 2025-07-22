@@ -55,16 +55,14 @@ fun DebugPanel(
                 onCopyLogs = onCopyLogs,
                 logCount = debugLogs.size
             )
-            
-            if (isExpanded) {
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // 调试日志列表
-                DebugLogsList(
-                    logs = debugLogs,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 调试日志列表（始终显示）
+            DebugLogsList(
+                logs = debugLogs,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
