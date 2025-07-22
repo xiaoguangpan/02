@@ -15,6 +15,8 @@ import com.dinghong.locationmock.manager.LatLng
 import com.dinghong.locationmock.manager.BaiduMap
 import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
+import com.dinghong.locationmock.manager.FavoriteManager
+import com.dinghong.locationmock.data.FavoriteLocation
 import com.dinghong.locationmock.utils.PermissionHelper
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -33,6 +35,7 @@ class MainViewModel : ViewModel() {
     
     private lateinit var locationMockManager: LocationMockManager
     private lateinit var mapInteractionManager: MapInteractionManager
+    private lateinit var favoriteManager: FavoriteManager
     
     // UI状态
     private val _uiState = MutableStateFlow(MainUiState())
@@ -48,13 +51,16 @@ class MainViewModel : ViewModel() {
         val searchText: String = "",
         val currentCoordinate: String = "",
         val isSimulating: Boolean = false,
-        val isEnhancedMode: Boolean = false,
         val showDebugPanel: Boolean = false,
+        val showHelpDialog: Boolean = false,
+        val showAddFavoriteDialog: Boolean = false,
+        val showFavoriteListDialog: Boolean = false,
         val debugLogs: List<String> = emptyList(),
         val selectedLocation: LatLng? = null,
         val isSearching: Boolean = false,
         val hasLocationPermission: Boolean = false,
-        val hasMockLocationPermission: Boolean = false
+        val hasMockLocationPermission: Boolean = false,
+        val favoriteLocations: List<FavoriteLocation> = emptyList()
     )
     
     /**
@@ -63,6 +69,7 @@ class MainViewModel : ViewModel() {
     fun initialize(context: Context) {
         locationMockManager = LocationMockManager(context)
         mapInteractionManager = MapInteractionManager(context)
+        favoriteManager = FavoriteManager(context)
         
         // 检查权限状态
         checkPermissions(context)
@@ -103,8 +110,18 @@ class MainViewModel : ViewModel() {
                 _uiState.value = _uiState.value.copy(isSearching = isSearching)
             }
         }
+
+        // 监听收藏列表
+        viewModelScope.launch {
+            favoriteManager.favoriteLocations.collect { favorites ->
+                _uiState.value = _uiState.value.copy(favoriteLocations = favorites)
+            }
+        }
         
         addDebugLog("定红定位模拟器已启动")
+
+        // 应用启动时自动获取当前位置
+        getCurrentLocationSilently()
     }
     
     /**
@@ -153,6 +170,13 @@ class MainViewModel : ViewModel() {
         mapInteractionManager.getCurrentLocation()
         addDebugLog("获取当前位置")
     }
+
+    /**
+     * 静默获取当前位置（不显示日志）
+     */
+    private fun getCurrentLocationSilently() {
+        mapInteractionManager.getCurrentLocation()
+    }
     
     /**
      * 切换位置模拟
@@ -187,14 +211,64 @@ class MainViewModel : ViewModel() {
     }
     
     /**
-     * 切换增强模式
+     * 显示添加收藏对话框
      */
-    fun toggleEnhancedMode() {
-        val newMode = !_uiState.value.isEnhancedMode
-        _uiState.value = _uiState.value.copy(isEnhancedMode = newMode)
-        
-        locationMockManager.toggleSimulationMode()
-        addDebugLog("切换到${if (newMode) "增强" else "标准"}模式")
+    fun showAddFavoriteDialog() {
+        if (_uiState.value.selectedLocation != null) {
+            _uiState.value = _uiState.value.copy(showAddFavoriteDialog = true)
+        } else {
+            addDebugLog("请先选择位置")
+        }
+    }
+
+    /**
+     * 隐藏添加收藏对话框
+     */
+    fun hideAddFavoriteDialog() {
+        _uiState.value = _uiState.value.copy(showAddFavoriteDialog = false)
+    }
+
+    /**
+     * 添加收藏
+     */
+    fun addFavorite(name: String, address: String) {
+        val selectedLocation = _uiState.value.selectedLocation
+        if (selectedLocation != null) {
+            favoriteManager.addFavorite(name, address, selectedLocation)
+            _uiState.value = _uiState.value.copy(showAddFavoriteDialog = false)
+            addDebugLog("已添加收藏: $name")
+        }
+    }
+
+    /**
+     * 显示收藏列表对话框
+     */
+    fun showFavoriteListDialog() {
+        _uiState.value = _uiState.value.copy(showFavoriteListDialog = true)
+    }
+
+    /**
+     * 隐藏收藏列表对话框
+     */
+    fun hideFavoriteListDialog() {
+        _uiState.value = _uiState.value.copy(showFavoriteListDialog = false)
+    }
+
+    /**
+     * 选择收藏位置
+     */
+    fun selectFavoriteLocation(favorite: FavoriteLocation) {
+        mapInteractionManager.moveToLocation(favorite.latLng)
+        _uiState.value = _uiState.value.copy(showFavoriteListDialog = false)
+        addDebugLog("选择收藏位置: ${favorite.name}")
+    }
+
+    /**
+     * 删除收藏
+     */
+    fun deleteFavorite(favoriteId: String) {
+        favoriteManager.removeFavorite(favoriteId)
+        addDebugLog("已删除收藏")
     }
     
     /**
@@ -214,16 +288,28 @@ class MainViewModel : ViewModel() {
      * 显示帮助
      */
     fun showHelp() {
+        _uiState.value = _uiState.value.copy(showHelpDialog = true)
         addDebugLog("显示帮助信息")
-        // TODO: 实现帮助对话框
+    }
+
+    /**
+     * 隐藏帮助对话框
+     */
+    fun hideHelpDialog() {
+        _uiState.value = _uiState.value.copy(showHelpDialog = false)
     }
     
     /**
-     * 重置指南针
+     * 启动导航
      */
-    fun resetCompass() {
-        mapInteractionManager.resetCompass()
-        addDebugLog("指南针已重置")
+    fun startNavigation() {
+        val selectedLocation = _uiState.value.selectedLocation
+        if (selectedLocation != null) {
+            mapInteractionManager.startNavigation(selectedLocation)
+            addDebugLog("启动导航到: ${String.format("%.6f, %.6f", selectedLocation.latitude, selectedLocation.longitude)}")
+        } else {
+            addDebugLog("请先选择目标位置")
+        }
     }
     
     /**

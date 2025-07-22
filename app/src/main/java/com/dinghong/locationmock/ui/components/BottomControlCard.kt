@@ -26,11 +26,11 @@ fun BottomControlCard(
     searchText: String = "",
     onSearchTextChange: (String) -> Unit = {},
     onSearchSubmit: () -> Unit = {},
-    onCurrentLocationClick: () -> Unit = {},
+
     isSimulating: Boolean = false,
     onSimulateToggle: () -> Unit = {},
-    isEnhancedMode: Boolean = false,
-    onEnhancedModeToggle: () -> Unit = {},
+    onAddFavoriteClick: () -> Unit = {},
+    onShowFavoritesClick: () -> Unit = {},
     currentCoordinate: String = ""
 ) {
     Card(
@@ -46,15 +46,14 @@ fun BottomControlCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // 搜索框
             SearchInputField(
                 searchText = searchText,
                 onSearchTextChange = onSearchTextChange,
-                onSearchSubmit = onSearchSubmit,
-                onCurrentLocationClick = onCurrentLocationClick
+                onSearchSubmit = onSearchSubmit
             )
             
             // 当前坐标显示
@@ -66,8 +65,8 @@ fun BottomControlCard(
             ControlButtonsRow(
                 isSimulating = isSimulating,
                 onSimulateToggle = onSimulateToggle,
-                isEnhancedMode = isEnhancedMode,
-                onEnhancedModeToggle = onEnhancedModeToggle
+                onAddFavoriteClick = onAddFavoriteClick,
+                onShowFavoritesClick = onShowFavoritesClick
             )
         }
     }
@@ -80,63 +79,47 @@ fun BottomControlCard(
 private fun SearchInputField(
     searchText: String,
     onSearchTextChange: (String) -> Unit,
-    onSearchSubmit: () -> Unit,
-    onCurrentLocationClick: () -> Unit
+    onSearchSubmit: () -> Unit
 ) {
-    Row(
+    // 搜索框
+    OutlinedTextField(
+        value = searchText,
+        onValueChange = onSearchTextChange,
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // 搜索框
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = onSearchTextChange,
-            modifier = Modifier.weight(1f),
-            placeholder = { Text("输入地址或坐标 (如: 116.404,39.915)", color = Color.Gray) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "搜索",
-                    tint = Color.White
-                )
-            },
-            trailingIcon = {
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = { onSearchTextChange("") }) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "清除",
-                            tint = Color.White
-                        )
-                    }
-                }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = Color.Gray
+        placeholder = {
+            Text(
+                "地址或坐标",
+                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium
             )
-        )
-        
-        // 当前位置按钮
-        IconButton(
-            onClick = onCurrentLocationClick,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.primary)
-        ) {
+        },
+        leadingIcon = {
             Icon(
-                imageVector = Icons.Default.MyLocation,
-                contentDescription = "获取当前位置",
+                imageVector = Icons.Default.Search,
+                contentDescription = "搜索",
                 tint = Color.White
             )
-        }
-    }
+        },
+        trailingIcon = {
+            if (searchText.isNotEmpty()) {
+                IconButton(onClick = { onSearchTextChange("") }) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "清除",
+                        tint = Color.White
+                    )
+                }
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.Gray
+        )
+    )
 }
 
 /**
@@ -166,12 +149,12 @@ private fun CoordinateDisplay(coordinate: String) {
 private fun ControlButtonsRow(
     isSimulating: Boolean,
     onSimulateToggle: () -> Unit,
-    isEnhancedMode: Boolean,
-    onEnhancedModeToggle: () -> Unit
+    onAddFavoriteClick: () -> Unit,
+    onShowFavoritesClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 模拟控制按钮
@@ -185,29 +168,41 @@ private fun ControlButtonsRow(
             Icon(
                 imageVector = if (isSimulating) Icons.Default.Stop else Icons.Default.PlayArrow,
                 contentDescription = if (isSimulating) "停止模拟" else "开始模拟",
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(if (isSimulating) "停止模拟" else "开始模拟")
         }
-        
-        // 增强模式开关
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+        // 添加收藏按钮
+        IconButton(
+            onClick = onAddFavoriteClick,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.secondary)
         ) {
-            Text(
-                text = "增强模式",
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "添加收藏",
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
             )
-            Switch(
-                checked = isEnhancedMode,
-                onCheckedChange = { onEnhancedModeToggle() },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                )
+        }
+
+        // 收藏列表按钮
+        IconButton(
+            onClick = onShowFavoritesClick,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.tertiary)
+        ) {
+            Icon(
+                imageVector = Icons.Default.List,
+                contentDescription = "收藏列表",
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
             )
         }
     }

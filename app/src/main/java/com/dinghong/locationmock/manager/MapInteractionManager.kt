@@ -1,6 +1,7 @@
 package com.dinghong.locationmock.manager
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.dinghong.locationmock.utils.CoordinateConverter
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -152,11 +153,34 @@ class MapInteractionManager(private val context: Context) {
     }
 
     /**
-     * 重置指南针（临时简化版本）
+     * 启动导航
      */
-    fun resetCompass() {
-        // 临时注释指南针重置操作
-        Log.i(TAG, "指南针重置")
+    fun startNavigation(destination: LatLng) {
+        try {
+            // 使用百度地图导航
+            val intent = Intent().apply {
+                data = android.net.Uri.parse(
+                    "baidumap://map/direction?destination=${destination.latitude},${destination.longitude}&mode=driving&src=reding"
+                )
+            }
+
+            // 检查是否安装了百度地图
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+                Log.i(TAG, "启动百度地图导航到: ${formatCoordinate(destination)}")
+            } else {
+                // 如果没有百度地图，使用系统默认地图应用
+                val fallbackIntent = Intent().apply {
+                    data = android.net.Uri.parse(
+                        "geo:${destination.latitude},${destination.longitude}?q=${destination.latitude},${destination.longitude}"
+                    )
+                }
+                context.startActivity(fallbackIntent)
+                Log.i(TAG, "使用系统地图导航到: ${formatCoordinate(destination)}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "启动导航失败", e)
+        }
     }
     
     /**

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     // 百度地图SDK - 暂时注释，先确保基本构建成功
     // implementation("com.baidu.lbsyun:BaiduMapSDK_Map:7.5.4")
     // TODO: 需要手动下载百度地图SDK的AAR文件

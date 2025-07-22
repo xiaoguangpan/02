@@ -18,6 +18,9 @@ import com.dinghong.locationmock.ui.components.BottomControlCard
 import com.dinghong.locationmock.ui.components.DebugPanel
 import com.dinghong.locationmock.ui.components.DebugStatusIndicator
 import com.dinghong.locationmock.ui.components.FloatingControls
+import com.dinghong.locationmock.ui.components.HelpDialog
+import com.dinghong.locationmock.ui.components.AddFavoriteDialog
+import com.dinghong.locationmock.ui.components.FavoriteDialog
 import com.dinghong.locationmock.viewmodel.MainViewModel
 
 /**
@@ -57,7 +60,7 @@ fun MainScreen(
             modifier = Modifier.align(Alignment.CenterEnd),
             onDebugClick = { viewModel.toggleDebugPanel() },
             onHelpClick = { viewModel.showHelp() },
-            onCompassClick = { viewModel.resetCompass() },
+            onNavigationClick = { viewModel.startNavigation() },
             onZoomInClick = { viewModel.zoomIn() },
             onZoomOutClick = { viewModel.zoomOut() }
         )
@@ -68,11 +71,10 @@ fun MainScreen(
             searchText = uiState.searchText,
             onSearchTextChange = { viewModel.updateSearchText(it) },
             onSearchSubmit = { viewModel.performSearch() },
-            onCurrentLocationClick = { viewModel.getCurrentLocation() },
             isSimulating = uiState.isSimulating,
             onSimulateToggle = { viewModel.toggleSimulation() },
-            isEnhancedMode = uiState.isEnhancedMode,
-            onEnhancedModeToggle = { viewModel.toggleEnhancedMode() },
+            onAddFavoriteClick = { viewModel.showAddFavoriteDialog() },
+            onShowFavoritesClick = { viewModel.showFavoriteListDialog() },
             currentCoordinate = uiState.currentCoordinate
         )
         
@@ -100,6 +102,32 @@ fun MainScreen(
             hasLocationPermission = uiState.hasLocationPermission,
             hasMockLocationPermission = uiState.hasMockLocationPermission
         )
+
+        // 帮助对话框（如果显示）
+        if (uiState.showHelpDialog) {
+            HelpDialog(
+                onDismiss = { viewModel.hideHelpDialog() }
+            )
+        }
+
+        // 添加收藏对话框（如果显示）
+        if (uiState.showAddFavoriteDialog && uiState.selectedLocation != null) {
+            AddFavoriteDialog(
+                latLng = uiState.selectedLocation!!,
+                onDismiss = { viewModel.hideAddFavoriteDialog() },
+                onConfirm = { name, address -> viewModel.addFavorite(name, address) }
+            )
+        }
+
+        // 收藏列表对话框（如果显示）
+        if (uiState.showFavoriteListDialog) {
+            FavoriteDialog(
+                favoriteLocations = uiState.favoriteLocations,
+                onDismiss = { viewModel.hideFavoriteListDialog() },
+                onSelectFavorite = { favorite -> viewModel.selectFavoriteLocation(favorite) },
+                onDeleteFavorite = { favoriteId -> viewModel.deleteFavorite(favoriteId) }
+            )
+        }
     }
 }
 

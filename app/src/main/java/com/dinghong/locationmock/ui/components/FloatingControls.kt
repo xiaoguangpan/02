@@ -24,7 +24,7 @@ fun FloatingControls(
     modifier: Modifier = Modifier,
     onDebugClick: () -> Unit = {},
     onHelpClick: () -> Unit = {},
-    onCompassClick: () -> Unit = {},
+    onNavigationClick: () -> Unit = {},
     onZoomInClick: () -> Unit = {},
     onZoomOutClick: () -> Unit = {}
 ) {
@@ -48,11 +48,11 @@ fun FloatingControls(
             onClick = onHelpClick
         )
         
-        // 指南针重置按钮
+        // 导航按钮
         FloatingControlButton(
-            icon = Icons.Default.Explore,
-            contentDescription = "指南针重置",
-            onClick = onCompassClick
+            icon = Icons.Default.Navigation,
+            contentDescription = "导航",
+            onClick = onNavigationClick
         )
         
         // 分隔线
@@ -106,7 +106,7 @@ private fun FloatingControlButton(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = iconTint,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
     }
