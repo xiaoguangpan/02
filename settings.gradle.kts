@@ -12,13 +12,17 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
         // 百度地图SDK仓库
         maven { url = uri("https://repo1.maven.org/maven2/") }
         maven { url = uri("https://jitpack.io") }
+        // 支持本地AAR文件
+        flatDir {
+            dirs("app/libs")
+        }
     }
 }
 
