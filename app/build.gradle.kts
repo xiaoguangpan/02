@@ -4,6 +4,13 @@ plugins {
     kotlin("plugin.serialization") version "1.9.10"
 }
 
+// 添加本地AAR文件仓库
+repositories {
+    flatDir {
+        dirs("libs")
+    }
+}
+
 android {
     namespace = "com.dinghong.locationmock"
     compileSdk = 34
@@ -78,8 +85,13 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    // 百度地图SDK - 使用本地AAR文件 (需要手动下载到libs目录)
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+    // 百度地图SDK - 使用flatDir方式引用
+    implementation(name: "BaiduLBS_Android", ext: "aar")
+    implementation(name: "NaviTts", ext: "aar")
+    implementation(name: "onsdk_all", ext: "aar")
+    implementation(files("libs/javapoet-1.9.0.jar"))
+    implementation(files("libs/protobuf-java-2.3.0-micro.jar"))
+    implementation(files("libs/protobuf_gens-map.jar"))
 
     // 网络请求依赖 (用于地址搜索API)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

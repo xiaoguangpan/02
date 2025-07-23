@@ -27,7 +27,7 @@ class LocationMockApplication : Application() {
         try {
             android.util.Log.i("LocationMock", "开始初始化百度地图SDK...")
 
-            // 百度地图SDK初始化 - 参考官方示例
+            // 百度地图SDK初始化
             SDKInitializer.setAgreePrivacy(this, true)
             try {
                 SDKInitializer.initialize(this)
