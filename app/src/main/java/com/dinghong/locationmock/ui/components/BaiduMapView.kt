@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.dp
 
 // 使用manager包中的统一类型定义
 import com.dinghong.locationmock.manager.LatLng
-import com.dinghong.locationmock.manager.BaiduMap
+
+// 临时类型定义，避免编译错误
+typealias BaiduMap = Any
 
 /**
  * 百度地图Compose组件（准备SDK集成版本）

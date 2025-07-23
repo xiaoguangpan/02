@@ -13,7 +13,9 @@ import androidx.lifecycle.viewModelScope
 
 // 使用本地定义的数据类
 import com.dinghong.locationmock.manager.LatLng
-import com.dinghong.locationmock.manager.BaiduMap
+
+// 临时类型定义，避免编译错误
+typealias BaiduMap = Any
 import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.manager.FavoriteManager
@@ -171,7 +173,7 @@ class MainViewModel : ViewModel() {
     /**
      * 地图准备完成
      */
-    fun onMapReady(baiduMap: Any?) {
+    fun onMapReady(baiduMap: com.baidu.mapapi.map.BaiduMap?) {
         try {
             if (baiduMap != null) {
                 addDebugLog("正在配置地图交互管理器...", "INFO")
