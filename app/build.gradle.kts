@@ -85,10 +85,10 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    // 百度地图SDK - 使用flatDir方式引用
-    implementation(name: "BaiduLBS_Android", ext: "aar")
-    implementation(name: "NaviTts", ext: "aar")
-    implementation(name: "onsdk_all", ext: "aar")
+    // 百度地图SDK - 使用files方式引用（参考CSDN博客）
+    implementation(files("libs/BaiduLBS_Android.aar"))
+    implementation(files("libs/NaviTts.aar"))
+    implementation(files("libs/onsdk_all.aar"))
     implementation(files("libs/javapoet-1.9.0.jar"))
     implementation(files("libs/protobuf-java-2.3.0-micro.jar"))
     implementation(files("libs/protobuf_gens-map.jar"))
