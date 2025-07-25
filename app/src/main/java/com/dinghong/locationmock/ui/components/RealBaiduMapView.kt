@@ -15,13 +15,8 @@ import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 
-// 百度地图SDK导入 - 临时注释，AAR文件可能有问题
-// import com.baidu.mapapi.map.BaiduMap as BaiduMapSDK
-// import com.baidu.mapapi.map.MapView
-// import com.baidu.mapapi.model.LatLng as BaiduLatLng
-
-// 临时类型定义
-typealias BaiduMapSDK = Any
+// 地图SDK类型定义 - 现在使用Google Maps
+typealias MapSDK = Any
 
 /**
  * 真实的百度地图组件
@@ -30,7 +25,7 @@ typealias BaiduMapSDK = Any
 @Composable
 fun RealBaiduMapView(
     modifier: Modifier = Modifier,
-    onMapReady: (BaiduMapSDK?) -> Unit = {},
+    onMapReady: (MapSDK?) -> Unit = {},
     onMapClick: (Pair<Double, Double>) -> Unit = {}
 ) {
     val context = LocalContext.current

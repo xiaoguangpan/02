@@ -7,15 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-// 临时注释百度地图SDK导入
-// import com.baidu.mapapi.map.BaiduMap
-// import com.baidu.mapapi.model.LatLng
-
-// 使用本地定义的数据类
 import com.dinghong.locationmock.manager.LatLng
-
-// 临时类型定义，避免编译错误
-typealias BaiduMap = Any
 import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.manager.FavoriteManager
