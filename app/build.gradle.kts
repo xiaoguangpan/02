@@ -86,7 +86,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     // 百度地图SDK - 使用flatDir方式
-    implementation(name: "BaiduLBS_Android", ext: "aar")
+    implementation(name = "BaiduLBS_Android", ext = "aar")
     implementation(files("$projectDir/libs/javapoet-1.9.0.jar"))
     implementation(files("$projectDir/libs/protobuf-java-2.3.0-micro.jar"))
     implementation(files("$projectDir/libs/protobuf_gens-map.jar"))
