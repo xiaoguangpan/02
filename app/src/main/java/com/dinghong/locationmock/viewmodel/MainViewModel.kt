@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dinghong.locationmock.manager.LatLng
+import com.google.android.gms.maps.GoogleMap
 import com.dinghong.locationmock.manager.LocationMockManager
 import com.dinghong.locationmock.manager.MapInteractionManager
 import com.dinghong.locationmock.manager.FavoriteManager
@@ -165,14 +166,14 @@ class MainViewModel : ViewModel() {
     /**
      * 地图准备完成
      */
-    fun onMapReady(baiduMap: Any?) {
+    fun onMapReady(googleMap: GoogleMap?) {
         try {
-            if (baiduMap != null) {
-                addDebugLog("正在配置地图交互管理器...", "INFO")
-                mapInteractionManager.initializeMap(baiduMap)
+            if (googleMap != null) {
+                addDebugLog("正在配置Google地图交互管理器...", "INFO")
+                mapInteractionManager.initializeMap(googleMap)
 
-                addDebugLog("✅ 百度地图组件初始化完成", "SUCCESS")
-                addDebugLog("🗺️ 地图类型: 百度地图SDK", "INFO")
+                addDebugLog("✅ Google地图组件初始化完成", "SUCCESS")
+                addDebugLog("🗺️ 地图类型: Google Maps SDK", "INFO")
                 addDebugLog("📍 可以点击地图选择位置或搜索地址", "INFO")
                 addDebugLog("🎯 当前默认位置：北京天安门", "INFO")
             } else {
