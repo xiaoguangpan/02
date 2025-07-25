@@ -14,15 +14,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.LatLng as GoogleLatLng
-import com.google.android.gms.maps.model.MarkerOptions
+// 百度地图SDK导入
+import com.baidu.mapapi.map.BaiduMap
+import com.baidu.mapapi.map.MapView
+import com.baidu.mapapi.model.LatLng as BaiduLatLng
 
-// 地图SDK类型定义 - 使用Google Maps
-typealias MapSDK = GoogleMap
+// 地图SDK类型定义 - 使用百度地图
+typealias MapSDK = BaiduMap
 
 /**
  * 真实的地图组件
@@ -36,38 +34,39 @@ fun RealBaiduMapView(
 ) {
     val context = LocalContext.current
     var isMapReady by remember { mutableStateOf(false) }
-    var googleMap by remember { mutableStateOf<GoogleMap?>(null) }
+    var baiduMap by remember { mutableStateOf<BaiduMap?>(null) }
 
     AndroidView(
         modifier = modifier,
         factory = { context ->
-            MapView(context).apply {
-                onCreate(null)
-                onResume()
-                getMapAsync { map ->
-                    googleMap = map
-                    isMapReady = true
+            try {
+                MapView(context).apply {
+                    onCreate(null)
+                    onResume()
 
-                    // 设置默认位置为北京天安门
-                    val defaultLocation = GoogleLatLng(39.9042, 116.4074)
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15f))
+                    val map = this.map
+                    baiduMap = map
+                    isMapReady = true
 
                     // 设置地图点击监听
                     map.setOnMapClickListener { latLng ->
                         onMapClick(latLng.latitude to latLng.longitude)
-
-                        // 清除之前的标记并添加新标记
-                        map.clear()
-                        map.addMarker(
-                            MarkerOptions()
-                                .position(latLng)
-                                .title("选中位置")
-                        )
                     }
 
                     // 通知地图准备完成
                     onMapReady(map)
-                    Log.i("GoogleMapView", "✅ Google地图初始化成功")
+                    Log.i("BaiduMapView", "✅ 百度地图初始化成功")
+                }
+            } catch (e: Exception) {
+                Log.e("BaiduMapView", "百度地图初始化失败: ${e.message}")
+                // 创建占位符
+                FrameLayout(context).apply {
+                    setBackgroundColor(android.graphics.Color.parseColor("#E8F4FD"))
+                    setOnClickListener {
+                        val lat = 39.904200 + (Math.random() - 0.5) * 0.01
+                        val lng = 116.407400 + (Math.random() - 0.5) * 0.01
+                        onMapClick(lat to lng)
+                    }
                 }
             }
         },

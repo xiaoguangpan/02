@@ -32,12 +32,7 @@
         android:theme="@style/Theme.LocationMock"
         tools:targetApi="31">
         
-        <!-- Google Maps API Key配置 -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBvOkBwgGlbUiuS-oSiUOyE0W3MvEKLarE" />
-
-        <!-- 百度地图API Key配置 (保留用于搜索服务) -->
+        <!-- 百度地图API Key配置 -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="RHIrMFCec8xoScSBBtbCMtrTNpLYrwjt" />

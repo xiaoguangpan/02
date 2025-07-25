@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-// Google Maps SDK导入
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.LatLng as GoogleLatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Marker
+// 百度地图SDK导入
+import com.baidu.mapapi.map.*
+import com.baidu.mapapi.model.LatLng as BaiduLatLng
+import com.baidu.mapapi.search.core.SearchResult
+import com.baidu.mapapi.search.geocode.*
+import com.baidu.mapapi.search.poi.*
 
 // 数据类定义
 data class LatLng(val latitude: Double, val longitude: Double)
@@ -39,7 +39,9 @@ class MapInteractionManager(private val context: Context) {
         private const val TAG = "MapInteractionManager"
     }
     
-    private var googleMap: GoogleMap? = null
+    private var baiduMap: BaiduMap? = null
+    private var geocodeSearch: GeoCoder? = null
+    private var poiSearch: PoiSearch? = null
     private var currentMarker: Marker? = null
     
     private val _selectedLocation = MutableStateFlow<LatLng?>(null)
@@ -57,20 +59,24 @@ class MapInteractionManager(private val context: Context) {
 
     
     /**
-     * 初始化Google地图
+     * 初始化百度地图
      */
-    fun initializeMap(map: GoogleMap?) {
-        this.googleMap = map
+    fun initializeMap(map: BaiduMap?) {
+        this.baiduMap = map
 
         if (map != null) {
+            // 初始化搜索服务
+            geocodeSearch = GeoCoder.newInstance()
+            poiSearch = PoiSearch.newInstance()
+
             // 设置地图类型为普通地图
-            map.mapType = GoogleMap.MAP_TYPE_NORMAL
+            map.mapType = BaiduMap.MAP_TYPE_NORMAL
 
             // 启用缩放控件
             map.uiSettings.isZoomControlsEnabled = true
             map.uiSettings.isCompassEnabled = true
 
-            Log.i(TAG, "✅ Google地图交互管理器初始化完成")
+            Log.i(TAG, "✅ 百度地图交互管理器初始化完成")
         } else {
             Log.w(TAG, "⚠️ 地图对象为空，跳过初始化")
         }
@@ -80,20 +86,19 @@ class MapInteractionManager(private val context: Context) {
      * 更新地图位置和标记
      */
     fun updateMapLocation(latLng: LatLng) {
-        googleMap?.let { map ->
-            val googleLatLng = GoogleLatLng(latLng.latitude, latLng.longitude)
+        baiduMap?.let { map ->
+            val baiduLatLng = BaiduLatLng(latLng.latitude, latLng.longitude)
 
             // 移动相机到新位置
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(googleLatLng, 15f))
+            val mapStatus = MapStatusUpdateFactory.newLatLngZoom(baiduLatLng, 15f)
+            map.animateMapStatus(mapStatus)
 
             // 清除之前的标记并添加新标记
-            currentMarker?.remove()
-            currentMarker = map.addMarker(
-                MarkerOptions()
-                    .position(googleLatLng)
-                    .title("选中位置")
-                    .snippet("${latLng.latitude}, ${latLng.longitude}")
-            )
+            map.clear()
+            val markerOptions = MarkerOptions()
+                .position(baiduLatLng)
+                .title("选中位置")
+            currentMarker = map.addOverlay(markerOptions) as? Marker
 
             Log.i(TAG, "地图位置已更新: ${formatCoordinate(latLng)}")
         }
@@ -344,9 +349,11 @@ class MapInteractionManager(private val context: Context) {
      * 清理资源
      */
     fun cleanup() {
+        geocodeSearch?.destroy()
+        poiSearch?.destroy()
         currentMarker?.remove()
         currentMarker = null
-        googleMap = null
+        baiduMap = null
 
         Log.i(TAG, "地图交互管理器已清理")
     }
