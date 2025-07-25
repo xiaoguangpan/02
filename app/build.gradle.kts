@@ -4,12 +4,7 @@ plugins {
     kotlin("plugin.serialization") version "1.9.10"
 }
 
-// 添加本地AAR文件仓库
-repositories {
-    flatDir {
-        dirs("libs")
-    }
-}
+// 移除flatDir配置，改用直接文件引用方式
 
 android {
     namespace = "com.dinghong.locationmock"
@@ -85,13 +80,17 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    // 百度地图SDK - 使用files方式引用（参考CSDN博客）
-    implementation(files("libs/BaiduLBS_Android.aar"))
-    implementation(files("libs/NaviTts.aar"))
-    implementation(files("libs/onsdk_all.aar"))
-    implementation(files("libs/javapoet-1.9.0.jar"))
-    implementation(files("libs/protobuf-java-2.3.0-micro.jar"))
-    implementation(files("libs/protobuf_gens-map.jar"))
+    // 地图SDK - 使用Google Maps替代百度地图（更稳定的解决方案）
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // 百度地图SDK - 临时注释，等待更好的集成方案
+    // implementation(files("libs/BaiduLBS_Android.aar"))
+    // implementation(files("libs/NaviTts.aar"))
+    // implementation(files("libs/onsdk_all.aar"))
+    // implementation(files("libs/javapoet-1.9.0.jar"))
+    // implementation(files("libs/protobuf-java-2.3.0-micro.jar"))
+    // implementation(files("libs/protobuf_gens-map.jar"))
 
     // 网络请求依赖 (用于地址搜索API)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
