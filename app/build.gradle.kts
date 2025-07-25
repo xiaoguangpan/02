@@ -4,7 +4,12 @@ plugins {
     kotlin("plugin.serialization") version "1.9.10"
 }
 
-// flatDir配置已移至settings.gradle.kts
+// 添加本地AAR文件仓库
+repositories {
+    flatDir {
+        dirs("libs")
+    }
+}
 
 android {
     namespace = "com.dinghong.locationmock"
